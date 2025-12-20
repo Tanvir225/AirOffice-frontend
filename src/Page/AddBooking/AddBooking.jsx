@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const AddBooking = () => {
   const [loading, setLoading] = useState(false);
@@ -13,16 +14,32 @@ const AddBooking = () => {
     },
     flight: {
       segments: [{ date: "", from: "", to: "", flightNo: "" }],
-      passengers: 1
+      passengers: "",
+      capacity: ""
     },
     fare: {
       perPassenger: "",
-      totalFare: ""
+      totalFare: 0
     },
-    file: {
-      excelPath: ""
-    }
+    payment: {
+      paidAmount: 0
+    },
+
   });
+
+  /* ================= AUTO TOTAL FARE ================= */
+  useEffect(() => {
+    const passengers = Number(booking.flight.passengers) || 0;
+    const perPassenger = Number(booking.fare.perPassenger) || 0;
+
+    setBooking((prev) => ({
+      ...prev,
+      fare: {
+        ...prev.fare,
+        totalFare: passengers * perPassenger
+      }
+    }));
+  }, [booking.flight.passengers, booking.fare.perPassenger]);
 
   /* ================= HANDLERS ================= */
 
@@ -47,19 +64,18 @@ const AddBooking = () => {
       ...booking,
       flight: {
         ...booking.flight,
-        segments: [
-          ...booking.flight.segments,
-          { date: "", from: "", to: "", flightNo: "" }
-        ]
+        segments: [...booking.flight.segments, { date: "", from: "", to: "", flightNo: "" }]
       }
     });
   };
 
   const removeSegment = (index) => {
-    const segments = booking.flight.segments.filter((_, i) => i !== index);
     setBooking({
       ...booking,
-      flight: { ...booking.flight, segments }
+      flight: {
+        ...booking.flight,
+        segments: booking.flight.segments.filter((_, i) => i !== index)
+      }
     });
   };
 
@@ -69,111 +85,68 @@ const AddBooking = () => {
 
     try {
       await axios.post("http://localhost:5000/api/bookings", booking);
-      alert("Booking Added Successfully ✅");
-      setLoading(false);
+      toast.success("Booking added successfully");
     } catch (error) {
-      console.error(error);
-      alert("Failed to add booking ❌");
-      setLoading(false);
+      toast.error("Failed to add booking");
     }
+
+    setLoading(false);
   };
 
   /* ================= UI ================= */
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-[#E9F7F1] rounded-xl">
-      <form onSubmit={handleSubmit} className="space-y-6">
+    <div className=" rounded-xl p-6">
+      <div className=" pr-2">
+        <form onSubmit={handleSubmit} className="space-y-6">
 
-        {/* ========== AGENCY INFO ========== */}
-        <div className="card bg-white shadow-md border border-[#D1FAE5]">
-          <div className="card-body">
-            <h2 className="text-lg font-semibold text-[#003E3A] border-b border-[#D1FAE5] pb-2">
-              Agency Information
+          {/* AGENCY */}
+          <div className="bg-white border border-[#96ddba] p-4 rounded-lg">
+            <h2 className="text-[#003E3A] font-semibold mb-3">
+              Agency Information <span className="text-red-600 text-base">*</span>
             </h2>
 
-            <div className="grid md:grid-cols-2 gap-4 mt-4">
-              <input
-                name="name"
-                placeholder="Agency Name"
-                className="input input-bordered border-[#D1FAE5] focus:border-[#00A651] focus:outline-none"
-                onChange={handleAgencyChange}
-                required
-              />
-
-              <input
-                name="contactPerson"
-                placeholder="Contact Person"
-                className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
-                onChange={handleAgencyChange}
-              />
-
-              <input
-                name="phone"
-                placeholder="Contact Number"
-                className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
-                onChange={handleAgencyChange}
-              />
-
-              <input
-                name="address"
-                placeholder="Address"
-                className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
-                onChange={handleAgencyChange}
-              />
+            <div className="grid md:grid-cols-2 gap-3">
+              {["name", "contactPerson", "phone", "address"].map((field) => (
+                <input
+                  key={field}
+                  name={field}
+                  placeholder={field}
+                  required
+                  className="input border border-blue-300 p-2 focus:outline-none focus:ring-0"
+                  onChange={handleAgencyChange}
+                />
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* ========== FLIGHT SEGMENTS ========== */}
-        <div className="card bg-white shadow-md border border-[#D1FAE5]">
-          <div className="card-body">
-            <h2 className="text-lg font-semibold text-[#003E3A] border-b border-[#D1FAE5] pb-2">
-              Flight Segments
+          {/* FLIGHT */}
+          <div className="bg-white border border-blue-300 p-4 rounded-lg">
+            <h2 className="text-[#003E3A] font-semibold mb-3">
+              Flight Details <span className="text-red-600 text-base">*</span>
             </h2>
 
-            {booking.flight.segments.map((_, index) => (
-              <div
-                key={index}
-                className="mt-4 border border-[#D1FAE5] rounded-lg p-4"
-              >
+            {booking.flight.segments.map((_, i) => (
+              <div key={i} className="border border-blue-300 p-3 rounded mb-3">
                 <div className="grid md:grid-cols-4 gap-3">
-                  <input
-                    type="date"
-                    name="date"
-                    className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
-                    onChange={(e) => handleSegmentChange(index, e)}
-                    required
-                  />
-
-                  <input
-                    name="from"
-                    placeholder="From (DAC)"
-                    className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
-                    onChange={(e) => handleSegmentChange(index, e)}
-                    required
-                  />
-
-                  <input
-                    name="to"
-                    placeholder="To (JED)"
-                    className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
-                    onChange={(e) => handleSegmentChange(index, e)}
-                    required
-                  />
-
-                  <input
-                    name="flightNo"
-                    placeholder="Flight No"
-                    className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
-                    onChange={(e) => handleSegmentChange(index, e)}
-                  />
+                  {["date", "from", "to", "flightNo"].map((field) => (
+                    <input
+                      key={field}
+                      required
+                      type={field === "date" ? "date" : "text"}
+                      name={field}
+                      placeholder={field}
+                      className="input border border-blue-300 p-2 focus:outline-none focus:ring-0"
+                      onChange={(e) => handleSegmentChange(i, e)}
+                    />
+                  ))}
                 </div>
 
                 {booking.flight.segments.length > 1 && (
                   <button
                     type="button"
-                    className="btn btn-xs mt-3 bg-[#DC2626] text-white hover:bg-red-700"
-                    onClick={() => removeSegment(index)}
+                    className="btn btn-sm bg-red-600 p-2 text-white mt-2"
+                    onClick={() => removeSegment(i)}
                   >
                     Remove Segment
                   </button>
@@ -183,83 +156,83 @@ const AddBooking = () => {
 
             <button
               type="button"
-              className="btn btn-sm mt-4 border border-[#00A651] text-[#00A651] bg-white hover:bg-[#00A651] hover:text-white"
+              className="btn  border bg-[#00A651] text-white p-2"
               onClick={addSegment}
             >
               + Add Segment
             </button>
-          </div>
-        </div>
 
-        {/* ========== FARE INFO ========== */}
-        <div className="card bg-white shadow-md border border-[#D1FAE5]">
-          <div className="card-body">
-            <h2 className="text-lg font-semibold text-[#003E3A] border-b border-[#D1FAE5] pb-2">
-              Fare Information
-            </h2>
-
-            <div className="grid md:grid-cols-3 gap-4 mt-4">
+            <div className="grid md:grid-cols-2 gap-3 mt-4">
               <input
                 type="number"
-                placeholder="Passengers"
-                className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
+                required
+                placeholder="Flight Capacity"
+                className="input border p-2 border-blue-300 focus:outline-none focus:ring-0"
                 onChange={(e) =>
                   setBooking({
                     ...booking,
-                    flight: {
-                      ...booking.flight,
-                      passengers: Number(e.target.value)
-                    }
+                    flight: { ...booking.flight, capacity: e.target.value }
                   })
                 }
               />
 
               <input
                 type="number"
-                placeholder="Fare per Passenger"
-                className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
+                required
+                placeholder="Booked Passengers"
+                className="input border p-2 border-blue-300 focus:outline-none focus:ring-0"
                 onChange={(e) =>
                   setBooking({
                     ...booking,
-                    fare: {
-                      ...booking.fare,
-                      perPassenger: Number(e.target.value)
-                    }
-                  })
-                }
-              />
-
-              <input
-                type="number"
-                placeholder="Total Fare"
-                className="input input-bordered border-[#D1FAE5] focus:border-[#00A651]"
-                onChange={(e) =>
-                  setBooking({
-                    ...booking,
-                    fare: {
-                      ...booking.fare,
-                      totalFare: Number(e.target.value)
-                    }
+                    flight: { ...booking.flight, passengers: e.target.value }
                   })
                 }
               />
             </div>
           </div>
-        </div>
+
+          {/* FARE */}
+          <div className="bg-white border border-blue-300 p-4 rounded-lg">
+            <h2 className="text-[#003E3A] font-semibold mb-3">
+              Fare Information <span className="text-red-600 text-base">*</span>
+            </h2>
+
+            <div className="grid md:grid-cols-2 gap-3">
+              <input
+                required
+                type="number"
+                placeholder="Fare per Passenger"
+                className="input p-2 border border-blue-300 focus:outline-none focus:ring-0"
+                onChange={(e) =>
+                  setBooking({
+                    ...booking,
+                    fare: { ...booking.fare, perPassenger: e.target.value }
+                  })
+                }
+              />
+
+              <input
+                type="number"
+                required
+                value={booking.fare.totalFare}
+                disabled
+                className="input p-2 bg-gray-100 border border-blue-300 focus:outline-none focus:ring-0"
+                placeholder="Total Fare (Auto)"
+              />
+            </div>
+          </div>
 
 
 
-        {/* ========== SUBMIT ========== */}
-        <button
-          type="submit"
-          className={`btn w-full bg-[#00A651] text-white hover:bg-[#008F46] ${
-            loading && "loading"
-          }`}
-        >
-          Save Booking
-        </button>
+          <button
+            type="submit"
+            className={`btn w-full bg-[#00A651] text-white ${loading && "loading"}`}
+          >
+            Save Booking
+          </button>
 
-      </form>
+        </form>
+      </div>
     </div>
   );
 };
