@@ -15,7 +15,8 @@ const AddBooking = () => {
     flight: {
       segments: [{ date: "", from: "", to: "", flightNo: "" }],
       passengers: "",
-      capacity: ""
+      capacity: "",
+      PNR: ""
     },
     fare: {
       perPassenger: "",
@@ -162,7 +163,7 @@ const AddBooking = () => {
               + Add Segment
             </button>
 
-            <div className="grid md:grid-cols-2 gap-3 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-4">
               <input
                 type="number"
                 required
@@ -185,6 +186,17 @@ const AddBooking = () => {
                   setBooking({
                     ...booking,
                     flight: { ...booking.flight, passengers: e.target.value }
+                  })
+                }
+              />
+              <input
+                type="text"
+                placeholder="PNR"
+                className="input border p-2 border-blue-300 focus:outline-none focus:ring-0"
+                onChange={(e) =>
+                  setBooking({
+                    ...booking,
+                    flight: { ...booking.flight, PNR: e.target.value }
                   })
                 }
               />

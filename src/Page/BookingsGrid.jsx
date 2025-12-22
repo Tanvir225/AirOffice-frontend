@@ -1,12 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { AllCommunityModule, ModuleRegistry } from 'ag-grid-community';
-import { AgGridReact } from 'ag-grid-react'; // React Data Grid Component
+import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
+import { AgGridReact } from "ag-grid-react";
 import { format } from "date-fns";
 import PaymentPatchForm from "../Component/PaymentPatchForm";
 import BookingView from "../Component/BookingView";
 
-// Register all Community features
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const BookingsGrid = () => {
@@ -14,6 +13,7 @@ const BookingsGrid = () => {
     const [loading, setLoading] = useState(true);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [viewBooking, setViewBooking] = useState(null);
+    const [activeTab, setActiveTab] = useState("pending");
 
     /* ================= FETCH BOOKINGS ================= */
 
@@ -28,14 +28,30 @@ const BookingsGrid = () => {
         fetchBookings();
     }, []);
 
+    /* ================= FILTER LOGIC ================= */
+
+    const filteredBookings = rowData.filter((b) => {
+        const due = Number(b.payment?.dueAmount || 0);
+
+        if (activeTab === "pending") return due > 0;
+        if (activeTab === "confirm") return due === 0;
+
+        return false;
+    });
+
+    const pendingCount = rowData.filter(
+        (b) => Number(b.payment?.dueAmount || 0) > 0
+    ).length;
+
+    const confirmCount = rowData.filter(
+        (b) => Number(b.payment?.dueAmount || 0) === 0
+    ).length;
+
     /* ================= ACTION HANDLERS ================= */
 
-    const handleView = (data) => {
-        setViewBooking(data);
-    };
+    const handleView = (data) => setViewBooking(data);
 
     const handleEdit = (data) => {
-        console.log("EDIT", data);
         alert(`Edit booking ${data._id}`);
     };
 
@@ -45,7 +61,6 @@ const BookingsGrid = () => {
 
     const handleDelete = async (id) => {
         if (!window.confirm("Delete this booking?")) return;
-
         await axios.delete(`http://localhost:5000/api/bookings/${id}`);
         fetchBookings();
     };
@@ -54,32 +69,34 @@ const BookingsGrid = () => {
 
     const ActionRenderer = (props) => {
         const data = props.data;
+        const due = Number(data.payment?.dueAmount || 0);
 
         return (
-            <div className="flex gap-1 items-center justify-center my-1">
+            <div className="flex gap-1 justify-center items-center mt-1">
                 <button
-                    className="btn btn-sm btn-primary text-white p-2"
+                    className="btn btn-xs btn-primary"
                     onClick={() => handleView(data)}
                 >
                     View
                 </button>
 
                 <button
-                    className="btn btn-sm btn-secondary text-white p-2"
+                    className="btn btn-xs btn-secondary"
                     onClick={() => handleEdit(data)}
                 >
                     Edit
                 </button>
 
                 <button
-                    className="btn btn-sm btn-info text-white p-2"
+                    className="btn btn-xs btn-info"
+                    disabled={due === 0}
                     onClick={() => handlePayment(data)}
                 >
                     Payment
                 </button>
 
                 <button
-                    className="btn btn-sm btn-error text-white p-2"
+                    className="btn btn-xs btn-error"
                     onClick={() => handleDelete(data._id)}
                 >
                     Delete
@@ -93,92 +110,97 @@ const BookingsGrid = () => {
     const columnDefs = [
         { headerName: "Agency", field: "agency.name" },
         { headerName: "Phone", field: "agency.phone" },
-        { headerName: "Contact Person", field: "agency.contactPerson" },
+        { headerName: "Contact", field: "agency.contactPerson" },
         {
             headerName: "Route",
             valueGetter: (p) =>
                 p.data.flight?.segments
                     ?.map((s) => `${s.from}-${s.to}`)
                     .join(" | "),
-
         },
         {
             headerName: "Dates",
             valueGetter: (p) =>
                 p.data.flight?.segments
-                    ?.map((s) => `${format(s.date, 'dd MMM yy')}`)
-
-
+                    ?.map((s) => format(s.date, "dd MMM yy"))
+                    .join(" | "),
         },
-        {
-            headerName: "Passengers",
-            field: "flight.passengers",
-
-        },
-        {
-            headerName: "Capacity",
-            field: "flight.capacity",
-
-        },
-        {
-            headerName: "Total Fare",
-            field: "fare.totalFare",
-
-        },
-        {
-            headerName: "Paid",
-            field: "payment.paidAmount",
-
-        },
-        {
-            headerName: "Due",
-            field: "payment.dueAmount",
-
-        },
+        { headerName: "PAX", field: "flight.passengers" },
+        { headerName: "Capacity", field: "flight.capacity" },
+        { headerName: "Total Fare", field: "fare.totalFare" },
+        { headerName: "Paid", field: "payment.paidAmount" },
+        { headerName: "Due", field: "payment.dueAmount" },
         {
             headerName: "Status",
-            field: "payment.status",
-
+            valueGetter: (p) =>
+                Number(p.data.payment?.dueAmount || 0) === 0
+                    ? "CONFIRM"
+                    : "PENDING",
+            cellStyle: (p) => ({
+                fontWeight: "bold",
+                color: p.value === "CONFIRM" ? "green" : "orange",
+            }),
         },
         {
             headerName: "Actions",
             cellRenderer: ActionRenderer,
-            width: 250
-
-        }
+            width: 220,
+        },
     ];
 
-    /* ================= GRID ================= */
+    /* ================= UI ================= */
 
     return (
         <div className="p-5">
-            <h2 className="text-[#003E3A] text-xl font-semibold mb-3">
-                All Bookings : {rowData.length}
+            <h2 className="text-[#003E3A] text-xl font-semibold mb-4">
+                Bookings Management | {filteredBookings.length} Records
             </h2>
 
+            {/* TABS */}
+            <div className="flex gap-2 mb-3">
+                <button
+                    onClick={() => setActiveTab("pending")}
+                    className={`btn btn-sm ${
+                        activeTab === "pending"
+                            ? "btn-warning"
+                            : "btn-outline"
+                    }`}
+                >
+                    Pending ({pendingCount})
+                </button>
+
+                <button
+                    onClick={() => setActiveTab("confirm")}
+                    className={`btn btn-sm ${
+                        activeTab === "confirm"
+                            ? "btn-success"
+                            : "btn-outline"
+                    }`}
+                >
+                    Confirm ({confirmCount})
+                </button>
+            </div>
+
+            {/* GRID */}
             <div
                 className="ag-theme-alpine w-full"
-                style={{ height: "90vh", width: "100%" }}
+                style={{ height: "85vh" }}
             >
                 <AgGridReact
-                    rowData={rowData}
+                    rowData={filteredBookings}
                     columnDefs={columnDefs}
-                    pagination={true}
+                    pagination
                     paginationPageSize={20}
-                    animateRows={true}
+                    animateRows
                     defaultColDef={{
                         sortable: true,
                         filter: true,
-                        resizable: true
-                    }}
-                    overlayLoadingTemplate={
-                        '<span class="ag-overlay-loading-center">Loading...</span>'
-                    }
-                    loadingOverlayComponentParams={{
-                        loadingMessage: "Loading bookings..."
+                        resizable: true,
                     }}
                 />
             </div>
+
+            {/* MODALS */}
             {selectedBooking && (
                 <PaymentPatchForm
                     booking={selectedBooking}
@@ -194,8 +216,9 @@ const BookingsGrid = () => {
                 />
             )}
 
-
-            {loading && <p className="text-center mt-3">Loading...</p>}
+            {loading && (
+                <p className="text-center mt-3">Loading bookings...</p>
+            )}
         </div>
     );
 };
