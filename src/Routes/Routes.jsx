@@ -3,6 +3,9 @@ import Home from "../Page/Home/Home";
 import Main from "../Layout/Main";
 import AddBooking from "../Page/AddBooking/AddBooking";
 import BookingsGrid from "../Page/BookingsGrid";
+import PaymentPage from "../Page/Payment/PaymentPage";
+import AddTopup from "../Page/Topup/AddTopUp";
+import TopupLedger from "../Page/Topup/TopupLedger";
 
 
 const router = createBrowserRouter([
@@ -22,6 +25,18 @@ const router = createBrowserRouter([
             {
                 path: "/add-booking",
                 element:<AddBooking></AddBooking>
+            },
+            {
+                path: "/payment",
+                element:<PaymentPage></PaymentPage>
+            },
+            {
+                path: "/add-topup",
+                element:<AddTopup></AddTopup>
+            },
+            {
+                path: "/topup",
+                element:<TopupLedger></TopupLedger>
             },
            
         ]

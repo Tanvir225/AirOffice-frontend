@@ -15,7 +15,7 @@ const AddBooking = () => {
     flight: {
       segments: [{ date: "", from: "", to: "", flightNo: "" }],
       passengers: "",
-      capacity: "",
+      capacity: 0,
       PNR: ""
     },
     fare: {

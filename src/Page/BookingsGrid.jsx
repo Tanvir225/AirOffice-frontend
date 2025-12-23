@@ -153,7 +153,7 @@ const BookingsGrid = () => {
     return (
         <div className="p-5">
             <h2 className="text-[#003E3A] text-xl font-semibold mb-4">
-                Bookings Management | {filteredBookings.length} Records
+                Bookings Management | {rowData.length} Records
             </h2>
 
             {/* TABS */}
