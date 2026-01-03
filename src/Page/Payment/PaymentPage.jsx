@@ -89,7 +89,7 @@ const PaymentPage = () => {
             </div>
 
             {/* ================= RESULTS ================= */}
-            <div className="print-area">
+            <div className="">
                 {loading && (
                     <p className="text-center text-gray-500">
                         Loading payments...
