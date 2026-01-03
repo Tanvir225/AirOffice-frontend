@@ -6,6 +6,7 @@ import BookingsGrid from "../Page/BookingsGrid";
 import PaymentPage from "../Page/Payment/PaymentPage";
 import AddTopup from "../Page/Topup/AddTopUp";
 import TopupLedger from "../Page/Topup/TopupLedger";
+import FlightInfo from "../Page/FlightInfo/FlightInfo";
 
 
 const router = createBrowserRouter([
@@ -37,6 +38,10 @@ const router = createBrowserRouter([
             {
                 path: "/topup",
                 element:<TopupLedger></TopupLedger>
+            },
+            {
+                path: "/flight-info",
+                element:<FlightInfo></FlightInfo>
             },
            
         ]

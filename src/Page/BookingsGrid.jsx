@@ -5,6 +5,7 @@ import { AgGridReact } from "ag-grid-react";
 import { format } from "date-fns";
 import PaymentPatchForm from "../Component/PaymentPatchForm";
 import BookingView from "../Component/BookingView";
+import { Link } from "react-router-dom";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -157,28 +158,31 @@ const BookingsGrid = () => {
             </h2>
 
             {/* TABS */}
-            <div className="flex gap-2 mb-3">
-                <button
-                    onClick={() => setActiveTab("pending")}
-                    className={`btn btn-sm ${
-                        activeTab === "pending"
-                            ? "btn-warning"
-                            : "btn-outline"
-                    }`}
-                >
-                    Pending ({pendingCount})
-                </button>
+            <div className="flex justify-between">
+                <div className="flex gap-2 mb-3">
+                    <button
+                        onClick={() => setActiveTab("pending")}
+                        className={`btn btn-sm ${activeTab === "pending"
+                                ? "btn-warning"
+                                : "btn-outline"
+                            }`}
+                    >
+                        Pending ({pendingCount})
+                    </button>
 
-                <button
-                    onClick={() => setActiveTab("confirm")}
-                    className={`btn btn-sm ${
-                        activeTab === "confirm"
-                            ? "btn-success"
-                            : "btn-outline"
-                    }`}
-                >
-                    Confirm ({confirmCount})
-                </button>
+                    <button
+                        onClick={() => setActiveTab("confirm")}
+                        className={`btn btn-sm ${activeTab === "confirm"
+                                ? "btn-success"
+                                : "btn-outline"
+                            }`}
+                    >
+                        Confirm ({confirmCount})
+                    </button>
+                </div>
+                <div>
+                    <Link to={'/add-booking'} className="btn btn-primary btn-sm">Add Booking</Link >
+                </div>
             </div>
 
             {/* GRID */}

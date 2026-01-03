@@ -13,6 +13,8 @@ const Sidebar = () => {
         { name: "Bookings", path: "/bookings", icon: <Plane size={18} /> },
         { name: "Payments", path: "/payment", icon: <CreditCard size={18} /> },
         { name: "Topup Ledger", path: "/topup", icon: <Wallet size={18} /> },
+        { name: "Flight Info", path: "/flight-info", icon: <Plane size={18} /> }
+
         
     ];
 

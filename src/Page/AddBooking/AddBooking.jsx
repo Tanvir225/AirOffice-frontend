@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { Link } from "react-router-dom";
 
 const AddBooking = () => {
   const [loading, setLoading] = useState(false);
@@ -98,6 +99,7 @@ const AddBooking = () => {
 
   return (
     <div className=" rounded-xl p-6">
+      <Link to={'/bookings'} className="btn btn-outline btn-primary btn-sm mb-1">back</Link>
       <div className=" pr-2">
         <form onSubmit={handleSubmit} className="space-y-6">
 

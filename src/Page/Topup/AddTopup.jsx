@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const AddTopup = ({ onSuccess }) => {
     const [type, setType] = useState("credit");
@@ -36,7 +36,10 @@ const AddTopup = ({ onSuccess }) => {
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-4 rounded border w-full">
-            <h3 className="font-semibold mb-3">Add Topup</h3>
+            <div className="flex items-center justify-between flex-row-reverse">
+                <h3 className="font-semibold mb-3">Add Topup</h3>
+                <Link to={'/topup'} className="btn btn-outline btn-sm mb-3">back</Link >
+            </div>
 
             <div className="grid grid-cols-2 gap-3">
                 <select
