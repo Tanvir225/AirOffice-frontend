@@ -47,10 +47,10 @@ const Login = () => {
     }
   };
   return (
-    <div className="w-full ">
+    <div className="w-full flex items-center justify-center bg-blue-100 p-5 min-h-screen">
       <div className="group flex w-full max-w-xl border border-blue-400 bg-white text-blue-400 shadow-lg ">
         <div className="relative hidden min-h-full w-1/3 overflow-hidden bg-blue-400 sm:block">
-          <h1 className="absolute bottom-3 right-3 text-right text-2xl font-semibold text-white">
+          <h1 className="absolute bottom-3 right-3 text-right text-xl font-semibold text-white">
             Hey! <br /> Welcome to
             <br /> Flynas Air-Office
           </h1>
@@ -107,5 +107,6 @@ const Login = () => {
     </div>
   );
 };
+
 
 export default Login;

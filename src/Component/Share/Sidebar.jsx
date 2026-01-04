@@ -19,7 +19,7 @@ const Sidebar = () => {
     ];
 
     return (
-        <aside className="h-full bg-[#003E3A] text-white rounded-lg p-4">
+        <aside className="h-screen bg-[#003E3A] text-white rounded-lg p-4">
             {/* LOGO / TITLE */}
             <div className="mb-6 text-center">
                 <h1 className="text-lg font-bold tracking-wide">

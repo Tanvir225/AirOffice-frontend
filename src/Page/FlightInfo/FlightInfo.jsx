@@ -51,8 +51,6 @@ const FlightInfo = () => {
 
     const columnDefs = useMemo(() => [
         { headerName: "Date", field: "date", filter: true },
-        { headerName: "From", field: "from", filter: true },
-        { headerName: "To", field: "to", filter: true },
         { headerName: "Route", field: "route", filter: true },
         { headerName: "Flight No", field: "flightNo", filter: true },
         {
@@ -113,5 +111,6 @@ const FlightInfo = () => {
         </div>
     );
 };
+
 
 export default FlightInfo;
