@@ -6,17 +6,37 @@ import {
 } from "recharts";
 import { format } from "date-fns";
 import { useEffect, useState } from "react";
+import useAxios from "../../Hook/useAxios";
+import useAuth from "../../Hook/useAuth";
+import toast from "react-hot-toast";
 
 const Home = () => {
 
     const [bookings, setBookings] = useState([]);
 
-    useEffect(() => {
-        fetch("http://localhost:5000/api/bookings")
-            .then(res => res.json())
-            .then(data => setBookings(data));
-    }, []);
+    // useEffect(() => {
+    //     fetch("http://localhost:5000/api/bookings")
+    //         .then(res => res.json())
+    //         .then(data => setBookings(data));
+    // }, []);
 
+
+    const axios = useAxios();
+    const { user, logoutUser } = useAuth();
+    axios.get("/bookings").then(res => {
+        setBookings(res.data);
+    }
+    ).catch(err => {
+        console.error("Error fetching bookings:", err);
+    });
+
+    //handleLogOut
+    const handleLogOut = () => {
+        logoutUser().then((res) => {
+            console.log(res);
+            toast.success("logout Successfull");
+        });
+    };
 
     /* =====================
        METRICS
@@ -70,7 +90,7 @@ const Home = () => {
         .join(" | ")
 
 
-    console.log(lastFlightDate);
+    // console.log(lastFlightDate);
 
     /* =====================
        CHART DATA
@@ -137,7 +157,7 @@ const Home = () => {
                                 </a>
                             </li>
                             <li><a>Settings</a></li>
-                            <li><a>Logout</a></li>
+                            <li><a onClick={handleLogOut}>Logout</a></li>
                         </ul>
                     </div>
                 </section>

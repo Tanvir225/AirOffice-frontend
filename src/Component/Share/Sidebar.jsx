@@ -9,12 +9,11 @@ import {
 
 const Sidebar = () => {
     const menu = [
-        { name: "Dashboard", path: "/", icon: <LayoutDashboard size={18} /> },
-        { name: "Bookings", path: "/bookings", icon: <Plane size={18} /> },
-        { name: "Payments", path: "/payment", icon: <CreditCard size={18} /> },
-        { name: "Topup Ledger", path: "/topup", icon: <Wallet size={18} /> },
-        { name: "Flight Info", path: "/flight-info", icon: <Plane size={18} /> }
-
+        { name: "Dashboard", path: "/flynas/home", icon: <LayoutDashboard size={18} /> },
+        { name: "Bookings", path: "/flynas/bookings", icon: <Plane size={18} /> },
+        { name: "Payments", path: "/flynas/payment", icon: <CreditCard size={18} /> },
+        { name: "Topup Ledger", path: "/flynas/topup", icon: <Wallet size={18} /> },
+        { name: "Flight Info", path: "/flynas/flight-info", icon: <Plane size={18} /> }
         
     ];
 

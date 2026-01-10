@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+
 import toast from "react-hot-toast";
 import { useLocation, useNavigate } from "react-router-dom";
-import usePublicAxios from "../../Hook/usePublicAxios";
+
 import useAuth from "../../Hook/useAuth";
+import usePublicAxios from "../../Hook/usePublicAxios";
 
 const Login = () => {
   //useContext
-  const { loginUser, googleLogin } = useAuth();
-  const [showPassword, setShowPassword] = useState(false);
+  const { loginUser } = useAuth();
+
 
   //navigation
   const navigate = useNavigate();
@@ -17,7 +18,7 @@ const Login = () => {
 
   //location
   const location = useLocation();
-  let from = location.state?.from?.pathname || "/";
+  let from = location.state?.from?.pathname || "/flynas/home";
 
   //login handler
   const handleLogin = async (e) => {
