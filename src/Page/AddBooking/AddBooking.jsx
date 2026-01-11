@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import useAxios from "../../Hook/useAxios";
 
 const AddBooking = () => {
   const [loading, setLoading] = useState(false);
+  const axios = useAxios();
+  const navigate = useNavigate();
 
   const [booking, setBooking] = useState({
     agency: {
@@ -86,8 +88,9 @@ const AddBooking = () => {
     setLoading(true);
 
     try {
-      await axios.post("http://localhost:5000/api/bookings", booking);
+      await axios.post("/bookings", booking);
       toast.success("Booking added successfully");
+      navigate("/flynas/bookings");
     } catch (error) {
       toast.error("Failed to add booking");
     }
@@ -98,8 +101,8 @@ const AddBooking = () => {
   /* ================= UI ================= */
 
   return (
-    <div className=" rounded-xl p-6">
-      <Link to={'/bookings'} className="btn btn-outline btn-primary btn-sm mb-1">back</Link>
+    <div className="rounded-xl p-6 h-screen overflow-y-auto">
+      <Link to={'/flynas/bookings'} className="btn bg-[#00b7ac] btn-sm mb-1">back</Link>
       <div className=" pr-2">
         <form onSubmit={handleSubmit} className="space-y-6">
 
@@ -148,7 +151,7 @@ const AddBooking = () => {
                 {booking.flight.segments.length > 1 && (
                   <button
                     type="button"
-                    className="btn btn-sm bg-red-600 p-2 text-white mt-2"
+                    className="btn btn-sm bg-red-600 p-2 text-white mt-2 hover:bg-neutral"
                     onClick={() => removeSegment(i)}
                   >
                     Remove Segment
@@ -159,7 +162,7 @@ const AddBooking = () => {
 
             <button
               type="button"
-              className="btn  border bg-[#00A651] text-white p-2"
+              className="btn btn-sm bg-[#00b7ac] text-white hover:bg-neutral "
               onClick={addSegment}
             >
               + Add Segment

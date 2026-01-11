@@ -1,13 +1,14 @@
 import { useState } from "react";
-import axios from "axios";
 import { format } from "date-fns";
+import useAxios from "../../Hook/useAxios";
+
 
 const PaymentPage = () => {
     const [date, setDate] = useState("");
     const [agency, setAgency] = useState("");
     const [results, setResults] = useState([]);
     const [loading, setLoading] = useState(false);
-
+    const axios = useAxios();
     /* ================= SEARCH ================= */
 
     const handleSearch = async () => {
@@ -22,18 +23,22 @@ const PaymentPage = () => {
             let res;
 
             if (agency) {
-                res = await axios.get(
-                    "http://localhost:5000/api/bookings/search",
-                    { params: { date, agency } }
-                );
+                axios.get('/bookings/search', {
+                    params: { date, agency }
+                }).then(response => {
+                    res = response?.data;
+                    setResults(res);
+                });
             } else {
-                res = await axios.get(
-                    "http://localhost:5000/api/bookings/by-date",
-                    { params: { date } }
-                );
+                axios.get('/bookings/by-date', {
+                    params: { date }
+                }).then(response => {
+                    res = response?.data;
+                    setResults(res);
+                }); 
             }
 
-            setResults(res.data);
+         
         } catch (err) {
             console.error(err);
             alert("Failed to fetch payment data");

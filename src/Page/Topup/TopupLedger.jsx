@@ -1,33 +1,54 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
+import { useState } from "react";
+
 import { Link } from "react-router-dom";
+import useAxios from "../../Hook/useAxios";
 
 const TopupLedger = () => {
   const [creditList, setCreditList] = useState([]);
   const [debitList, setDebitList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const axios = useAxios();
 
-  const fetchTopups = async () => {
-    const res = await axios.get("http://localhost:5000/api/topups");
+  // const fetchTopups = async () => {
+  //   const res = await axios.get("http://localhost:5000/api/topups");
 
-    const credits = res.data.filter((t) => t.type === "credit");
-    const debits = res.data.filter((t) => t.type === "debit");
+  //   const credits = res.data.filter((t) => t.type === "credit");
+  //   const debits = res.data.filter((t) => t.type === "debit");
 
+  //   setCreditList(credits);
+  //   setDebitList(debits);
+  // };
+
+  // useEffect(() => {
+  //   fetchTopups();
+  // }, []);
+
+  axios.get("topups").then((response) => {
+    const credits = response.data.filter((t) => t.type === "credit");
+    const debits = response.data.filter((t) => t.type === "debit");
     setCreditList(credits);
     setDebitList(debits);
-  };
+    setLoading(false);
+  }
+  );
 
-  useEffect(() => {
-    fetchTopups();
-  }, []);
 
   const totalCredit = creditList.reduce((sum, t) => sum + t.amount, 0);
   const totalDebit = debitList.reduce((sum, t) => sum + t.amount, 0);
   const balance = totalCredit - totalDebit;
 
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="loading loading-infinity loading-xl text-3xl"></span>
+      </div>
+    );
+  }
+
   return (
     <div className="p-5 space-y-6 bg-white rounded border ">
       <div className="text-right">
-        <Link to={"/add-topup"} className="btn btn-sm btn-primary no-print">
+        <Link to={"/flynas/add-topup"} className="btn btn-sm bg-[#00b7ac] text-white hover:bg-neutral no-print">
           Add Topup
         </Link>
       </div>

@@ -31,14 +31,14 @@ const AddTopup = ({ onSuccess }) => {
         );
 
         toast.success("Topup added successfully");
-        navigate("/topup");
+        navigate("/flynas/topup");
     };
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-4 rounded border w-full">
             <div className="flex items-center justify-between flex-row-reverse">
                 <h3 className="font-semibold mb-3">Add Topup</h3>
-                <Link to={'/topup'} className="btn btn-outline btn-sm mb-3">back</Link >
+                <Link to={'/flynas/topup'} className="btn btn-outline btn-sm mb-3">back</Link >
             </div>
 
             <div className="grid grid-cols-2 gap-3">

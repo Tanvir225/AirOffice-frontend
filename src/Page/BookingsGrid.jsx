@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { format } from "date-fns";
 import PaymentPatchForm from "../Component/PaymentPatchForm";
 import BookingView from "../Component/BookingView";
 import { Link } from "react-router-dom";
+import useAxios from "../Hook/useAxios";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const BookingsGrid = () => {
     const [rowData, setRowData] = useState([]);
+    const axios = useAxios();
     const [loading, setLoading] = useState(true);
     const [selectedBooking, setSelectedBooking] = useState(null);
     const [viewBooking, setViewBooking] = useState(null);
@@ -20,9 +22,17 @@ const BookingsGrid = () => {
 
     const fetchBookings = async () => {
         setLoading(true);
-        const res = await axios.get("http://localhost:5000/api/bookings");
-        setRowData(res.data);
-        setLoading(false);
+        axios.get("/bookings").then(res => {
+            setRowData(res.data);
+            setLoading(false);
+        }
+        ).catch(err => {
+            console.error("Error fetching bookings:", err);
+            setLoading(false);
+        });
+        // const res = await axios.get("http://localhost:5000/api/bookings");
+        // setRowData(res.data);
+        // setLoading(false);
     };
 
     useEffect(() => {
@@ -151,6 +161,13 @@ const BookingsGrid = () => {
 
     /* ================= UI ================= */
 
+    // LOADING STATE
+    if (loading) {
+        return (<div className="flex justify-center items-center h-screen">
+            <span className="loading loading-infinity loading-xl text-3xl"></span>
+        </div>);
+    }
+
     return (
         <div className="p-5">
             <h2 className="text-[#003E3A] text-xl font-semibold mb-4">
@@ -163,8 +180,8 @@ const BookingsGrid = () => {
                     <button
                         onClick={() => setActiveTab("pending")}
                         className={`btn btn-sm ${activeTab === "pending"
-                                ? "btn-warning"
-                                : "btn-outline"
+                            ? "btn-warning"
+                            : "btn-outline"
                             }`}
                     >
                         Pending ({pendingCount})
@@ -173,21 +190,21 @@ const BookingsGrid = () => {
                     <button
                         onClick={() => setActiveTab("confirm")}
                         className={`btn btn-sm ${activeTab === "confirm"
-                                ? "btn-success"
-                                : "btn-outline"
+                            ? "btn-success"
+                            : "btn-outline"
                             }`}
                     >
                         Confirm ({confirmCount})
                     </button>
                 </div>
                 <div>
-                    <Link to={'/add-booking'} className="btn btn-primary btn-sm">Add Booking</Link >
+                    <Link to={'/flynas/add-booking'} className="btn bg-[#00b7ac] text-white hover:bg-neutral btn-sm">Add Booking</Link >
                 </div>
             </div>
 
             {/* GRID */}
             <div
-                className="ag-theme-alpine w-full"
+                className="ag-theme-alpine w-full overflow-y-auto"
                 style={{ height: "85vh" }}
             >
                 <AgGridReact

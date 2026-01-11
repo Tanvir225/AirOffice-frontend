@@ -1,7 +1,13 @@
 import React from 'react';
+import img1 from '../../assets/img/family.jpg'
+import img2 from '../../assets/img/Chairman.jpg'
+import img3 from '../../assets/img/flynas-saudi-arabia.jpg'
+import img4 from '../../assets/img/Flynas-Aircraft.jpg'
 
 const Landing = () => {
     const [currentSlider, setCurrentSlider] = useState(0);
+
+    const { user } = useAuth();
 
     // if you don't want to change the slider automatically then you can just remove the useEffect
     useEffect(() => {
@@ -11,8 +17,10 @@ const Landing = () => {
 
     return (
         <div>
-            <div className='bg-sky-200 p-3 text-right'>
-                <Link to="/login" className='btn btn-outline px-10 btn-primary'>login</Link>
+            <div className='bg-[#00b7ac] p-2 text-right'>
+                {
+                    user ? (<Link to="/flynas/home" className='btn  px-10'>Dashboard</Link>) : (<Link to="/login" className='btn  px-10'>Login</Link>)
+                }
             </div>
             <div
                 className="flex  w-full transform flex-col items-center justify-center gap-5 bg-cover bg-center duration-1000 ease-linear before:absolute before:inset-0 before:bg-black/50 sm:h-96 md:h-[88vh] lg:gap-10"
@@ -24,7 +32,7 @@ const Landing = () => {
                     <p className="text-sm md:text-base lg:text-lg">{carouselItems[currentSlider].des}</p>
                 </div>
             </div>
- 
+
         </div>
     );
 };
@@ -34,31 +42,28 @@ export default Landing;
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import useAuth from '../../Hook/useAuth';
 
 const carouselItems = [
     {
-        img: 'https://images.unsplash.com/photo-1421789665209-c9b2a435e3dc?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3',
+        img: img1,
         title: 'Escape 1',
         des: 'A Symphony of Tranquility. Experience the perfect blend of relaxation and excitement.'
     },
     {
-        img: 'https://images.unsplash.com/photo-1508873881324-c92a3fc536ba?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3',
+        img: img2,
         title: 'Escape 2',
         des: 'A Symphony of Tranquility. Experience the perfect blend of relaxation and excitement.'
     },
     {
-        img: 'https://images.unsplash.com/photo-1719749990914-a3ba54e6343f?q=80&w=2072&auto=format&fit=crop&ixlib=rb-4.0.3',
+        img: img3,
         title: 'Escape 3',
         des: 'A Symphony of Tranquility. Experience the perfect blend of relaxation and excitement.'
     },
     {
-        img: 'https://images.unsplash.com/photo-1467195468637-72eb862bb14e?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3',
+        img: img4,
         title: 'Escape 4',
         des: 'A Symphony of Tranquility. Experience the perfect blend of relaxation and excitement.'
     },
-    {
-        img: 'https://images.unsplash.com/photo-1532155297578-a43684be8db8?q=80&w=2071&auto=format&fit=crop&ixlib=rb-4.0.3',
-        title: 'Escape 5',
-        des: 'A Symphony of Tranquility. Experience the perfect blend of relaxation and excitement.'
-    }
+
 ];

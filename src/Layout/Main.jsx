@@ -9,7 +9,7 @@ const Main = () => {
             <div className="col-span-full md:col-span-2">
                 <Sidebar></Sidebar>
             </div>
-            <div className="col-span-full md:col-span-10 bg-base-300 rounded">
+            <div className="col-span-full md:col-span-10 bg-blue-50 rounded">
                 <Outlet></Outlet>
             </div>
         </div>

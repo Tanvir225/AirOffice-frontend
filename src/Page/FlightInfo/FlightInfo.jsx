@@ -1,11 +1,14 @@
 import { useEffect, useMemo, useState } from "react";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
+import useAxios from "../../Hook/useAxios";
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const FlightInfo = () => {
     const [rowData, setRowData] = useState([]);
     const [search, setSearch] = useState("");
+    const axios = useAxios();
+    const [loading, setLoading] = useState(true);
 
     const processFlightData = (bookings) => {
         const map = {};
@@ -42,10 +45,14 @@ const FlightInfo = () => {
     };
 
     useEffect(() => {
-        fetch("http://localhost:5000/api/bookings")
-            .then(res => res.json())
-            .then(data => processFlightData(data));
-    }, []);
+        axios.get("/bookings").then(res => {
+            processFlightData(res.data);
+            setLoading(false);
+        }).catch(err => {
+            console.error("Error fetching bookings:", err);
+            setLoading(false);
+        });
+    }, [axios]);
 
 
 
@@ -81,6 +88,16 @@ const FlightInfo = () => {
         resizable: true,
         floatingFilter: true
     }), []);
+
+    /* ================= UI ================= */
+
+    if (loading) {
+        return (
+            <div className="flex justify-center items-center h-screen">
+                <span className="loading loading-infinity loading-xl text-3xl"></span>
+            </div>
+        );
+    }
 
     return (
         <div className="bg-base-100 p-5 rounded-lg shadow ">

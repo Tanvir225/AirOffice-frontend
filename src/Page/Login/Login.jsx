@@ -1,6 +1,6 @@
 
 import toast from "react-hot-toast";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 import useAuth from "../../Hook/useAuth";
 import usePublicAxios from "../../Hook/usePublicAxios";
@@ -59,9 +59,14 @@ const Login = () => {
           <span className="absolute -left-5 -top-5 z-10 h-36 w-36 rounded-full bg-blue-800/50"></span>
         </div>
         <form onSubmit={handleLogin} className="flex-1 p-8">
-          <h1 className="pb-6 text-3xl font-semibold tracking-tight">
-            Sign In
-          </h1>
+          <div className="flex flex-row-reverse items-center justify-between mb-6">
+            <h1 className=" text-3xl font-semibold tracking-tight">
+              Sign In
+            </h1>
+            <div className="">
+              <Link to={'/'} className="btn btn-sm">back</Link>
+            </div>
+          </div>
           <div className="space-y-5">
             <div className="relative text-sm">
               <input

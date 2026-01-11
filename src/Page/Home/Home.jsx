@@ -1,277 +1,295 @@
 import {
     BarChart, Bar, XAxis, YAxis, Tooltip,
     ResponsiveContainer, CartesianGrid,
-    PieChart, Pie, Cell,
-    LineChart, Line
+    PieChart, Pie, Cell
 } from "recharts";
-import { format } from "date-fns";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import useAxios from "../../Hook/useAxios";
-import useAuth from "../../Hook/useAuth";
-import toast from "react-hot-toast";
+import { format } from "date-fns";
+
+const COLORS = ["#0f766e", "#2563eb", "#9333ea", "#f59e0b", "#ef4444"];
 
 const Home = () => {
 
-    const [bookings, setBookings] = useState([]);
-
-    // useEffect(() => {
-    //     fetch("http://localhost:5000/api/bookings")
-    //         .then(res => res.json())
-    //         .then(data => setBookings(data));
-    // }, []);
-
-
     const axios = useAxios();
-    const { user, logoutUser } = useAuth();
-    axios.get("/bookings").then(res => {
-        setBookings(res.data);
-    }
-    ).catch(err => {
-        console.error("Error fetching bookings:", err);
-    });
+    const [bookings, setBookings] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    //handleLogOut
-    const handleLogOut = () => {
-        logoutUser().then((res) => {
-            console.log(res);
-            toast.success("logout Successfull");
+    /* ================= FETCH BOOKINGS ================= */
+
+    useEffect(() => {
+        axios.get("/bookings")
+            .then(res => {
+                setBookings(res.data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
+    }, [axios]);
+
+    /* ================= KPIs ================= */
+
+    const {
+        totalBookings,
+        totalSegments,
+        totalPassengers,
+        totalCapacity,
+        totalSales,
+        totalDue,
+        lastFlight
+    } = useMemo(() => {
+
+        let segments = 0;
+        let passengers = 0;
+        let capacity = 0;
+        let sales = 0;
+        let due = 0;
+
+        bookings.forEach(b => {
+            segments += b.flight?.segments?.length || 0;
+            passengers += Number(b.flight?.passengers || 0);
+            capacity += Number(b.flight?.capacity || 0);
+            sales += Number(b.fare?.totalFare || 0);
+            due += Number(b.payment?.dueAmount || 0);
         });
-    };
+
+        const last = [...bookings]
+            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+
+        return {
+            totalBookings: bookings.length,
+            totalSegments: segments,
+            totalPassengers: passengers,
+            totalCapacity: capacity,
+            totalSales: sales,
+            totalDue: due,
+            lastFlight: last
+        };
+
+    }, [bookings]);
+
 
     /* =====================
-       METRICS
-    ===================== */
+   
 
 
-    const totalBookings = bookings.reduce(
-        (sum, b) => sum + (b.flight?.passengers || 0), 0
-    );
+    /* ================= BAR CHART 1: AGENCY vs SEATS ================= */
 
-    const totalSegments = bookings.reduce(
-        (sum, b) => sum + (b.flight?.segments?.length || 0), 0
-    );
+    const agencySeats = useMemo(() => {
+        const map = {};
 
-    const totalCapacityUsed = bookings.reduce(
-        (sum, b) => sum + (b.flight?.passengers || 0), 0
-    );
+        bookings.forEach(b => {
+            const agency = b.agency?.name;
+            const pax = Number(b.flight?.passengers || 0);
+            if (!agency) return;
+            map[agency] = (map[agency] || 0) + pax;
+        });
 
-    const totalCapacity = bookings.reduce(
-        (sum, b) => sum + (b.flight?.capacity || 0), 0
-    );
+        return Object.entries(map)
+            .map(([name, seats]) => ({ name, seats }))
+            .sort((a, b) => b.seats - a.seats)
+            .slice(0, 5);
+    }, [bookings]);
 
-    const capacityUsedPercent = totalCapacity
-        ? ((totalCapacityUsed / totalCapacity) * 100).toFixed(1)
-        : 0;
+    /* ================= BAR CHART 2: FARE vs PASSENGERS ================= */
 
-    const totalSales = bookings.reduce(
-        (sum, b) => sum + (b.fare?.totalFare || 0), 0
-    );
+    const farePassengers = useMemo(() => {
+        const map = {};
 
-    const totalDue = bookings.reduce(
-        (sum, b) => sum + (b.payment?.dueAmount || 0), 0
-    );
+        bookings.forEach(b => {
+            const fare = b.fare?.perPassenger;
+            const pax = Number(b.flight?.passengers || 0);
+            if (!fare) return;
+            map[fare] = (map[fare] || 0) + pax;
+        });
 
-    /* =====================
-       LAST FLIGHT BOOKING
-    ===================== */
+        return Object.entries(map)
+            .map(([fare, passengers]) => ({
+                fare: `৳${fare}`,
+                passengers
+            }))
+            .sort((a, b) => b.passengers - a.passengers)
+            .slice(0, 5);
+    }, [bookings]);
 
-    const lastBooking = bookings
-        .slice()
-        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+    /* ================= PIE CHART: SALES vs DUE ================= */
 
-    const lastFlightPassengers = lastBooking?.flight?.passengers || 0;
-
-    const lastFlightRoute = lastBooking?.flight?.segments
-        ?.map(s => `${s.from.toUpperCase()} → ${s.to.toUpperCase()}`)
-        .join(" | ");
-
-    const lastFlightDate = lastBooking?.flight?.segments
-        ?.map(s => `${s.date}`)
-        .join(" | ")
-
-
-    // console.log(lastFlightDate);
-
-    /* =====================
-       CHART DATA
-    ===================== */
-
-    // Top Agencies by Seats
-    const agencySeatData = Object.values(
-        bookings.reduce((acc, b) => {
-            const name = b.agency?.name;
-            if (!name) return acc;
-            acc[name] = acc[name] || { name, seats: 0 };
-            acc[name].seats += b.flight?.passengers || 0;
-            return acc;
-        }, {})
-    ).sort((a, b) => b.seats - a.seats).slice(0, 5);
-
-    // Fare vs Passengers
-    const farePassengerData = bookings.map(b => ({
-        fare: b.fare?.totalFare,
-        passengers: b.flight?.passengers
-    }));
-
-    // Sales vs Due
-    const salesDueData = [
-        { name: "Sales", value: totalSales - totalDue },
+    const salesDueChart = useMemo(() => ([
+        { name: "Paid", value: totalSales - totalDue },
         { name: "Due", value: totalDue }
-    ];
+    ]), [totalSales, totalDue]);
 
-    // Booking Trend (NEW LINE CHART)
-    const bookingTrendData = Object.values(
+    if (loading) {
+        return (
+            <div className="h-screen flex items-center justify-center">
+                <span className="loading loading-spinner loading-lg"></span>
+            </div>
+        );
+    }
+
+    const bookingCountByDate = Object.values(
         bookings.reduce((acc, b) => {
-            const date = format(new Date(b.createdAt), "dd MMM");
+            const date = b.flight?.segments?.[0]?.date;
+            if (!date) return acc;
+
             acc[date] = acc[date] || { date, count: 0 };
             acc[date].count += 1;
             return acc;
         }, {})
     );
 
+
     return (
         <div className="h-screen overflow-y-auto p-5 space-y-6">
 
-            {/* ===== HEADER ===== */}
-            <div className="flex items-center justify-between">
+            {/* ================= TITLE ================= */}
+            <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-bold text-[#003E3A]">
-                    Hi there, Welcome Back!
+                    Welcome Flynas
                 </h2>
 
-                <section>
-                    <div className="dropdown dropdown-end">
-                        <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
-                            <div className="w-10 rounded-full">
-                                <img
-                                    alt="Tailwind CSS Navbar component"
-                                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
-                            </div>
-                        </div>
-                        <ul
-                            tabIndex="-1"
-                            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                            <li>
-                                <a className="justify-between">
-                                    Profile
-                                    <span className="badge">New</span>
-                                </a>
-                            </li>
-                            <li><a>Settings</a></li>
-                            <li><a onClick={handleLogOut}>Logout</a></li>
-                        </ul>
-                    </div>
-                </section>
             </div>
+            {/* ================= KPI CARDS ================= */}
 
-            {/* ===== METRIC CARDS ===== */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Metric title="Total Bookings" value={totalBookings} />
-                <Metric title="Total Flights (Segments)" value={totalSegments} />
-                <Metric title="Capacity Used %" value={`${capacityUsedPercent}%`} />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <Metric title="Total Sales" value={totalSales.toLocaleString()} />
-                <Metric title="Total Due" value={totalDue.toLocaleString()} />
+                <div className="stat bg-base-100 rounded shadow">
+                    <div className="stat-title">Total Capacity</div>
+                    <div className="stat-value">{totalCapacity}</div>
+                </div>
 
-                {/* ===== LAST FLIGHT BOOKING ===== */}
-                <div className="bg-base-100 p-4 rounded shadow">
-                    <h3 className="font-semibold mb-2">
-                        Last Flight Booking
-                    </h3>
-                    <p className="text-sm">
-                        <strong>Date:</strong> {lastFlightDate}
-                    </p>
-                    <p className="text-sm">
-                        <strong>Route:</strong> {lastFlightRoute}
-                    </p>
-                    <p className="text-sm">
-                        <strong>Passengers:</strong> {lastFlightPassengers}
-                    </p>
+                <div className="stat bg-base-100 rounded shadow">
+                    <div className="stat-title">Total Passengers</div>
+                    <div className="stat-value">{totalPassengers}</div>
                 </div>
             </div>
 
-            {/* ===== CHARTS ===== */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
 
-                {/* Top Agencies */}
-                <ChartCard title="Top Agencies by Seats">
-                    <BarChart data={agencySeatData}>
-                        <XAxis dataKey="name" />
-                        <YAxis />
-                        <Tooltip />
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <Bar dataKey="seats" fill="#0f766e" />
-                    </BarChart>
-                </ChartCard>
+                <div className="stat bg-base-100 rounded shadow">
+                    <div className="stat-title">Bookings</div>
+                    <div className="stat-value">{totalBookings}</div>
+                </div>
 
-                {/* Fare vs Passenger */}
-                <ChartCard title="Fare vs Passengers">
-                    <BarChart data={farePassengerData}>
-                        <XAxis dataKey="fare" />
-                        <YAxis />
-                        <Tooltip />
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <Bar dataKey="passengers" fill="#2563eb" />
-                    </BarChart>
-                </ChartCard>
+                <div className="stat bg-base-100 rounded shadow">
+                    <div className="stat-title">Flight Segments</div>
+                    <div className="stat-value">{totalSegments}</div>
+                </div>
 
-                {/* Sales vs Due (Pie) */}
-                <ChartCard title="Sales vs Due">
-                    <PieChart>
-                        <Tooltip />
-                        <Pie
-                            data={salesDueData}
-                            dataKey="value"
-                            nameKey="name"
-                            innerRadius={60}
-                            outerRadius={100}
-                        >
-                            <Cell fill="#22c55e" />
-                            <Cell fill="#ef4444" />
-                        </Pie>
-                    </PieChart>
-                </ChartCard>
+                <div className="stat bg-base-100 rounded shadow">
+                    <div className="stat-title">Capacity Used</div>
+                    <div className="stat-value">
+                        {totalCapacity
+                            ? ((totalPassengers / totalCapacity) * 100).toFixed(1)
+                            : 0}%
+                    </div>
+                </div>
 
-                {/* NEW LINE CHART */}
-                <ChartCard title="Booking Trend">
-                    <LineChart data={bookingTrendData}>
-                        <XAxis dataKey="date" />
-                        <YAxis />
-                        <Tooltip />
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <Line
-                            type="monotone"
-                            dataKey="count"
-                            stroke="#9333ea"
-                            strokeWidth={3}
-                        />
-                    </LineChart>
-                </ChartCard>
+                <div className="stat bg-base-100 rounded shadow">
+                    <div className="stat-title">Total Sales</div>
+                    <div className="stat-value">৳{totalSales.toLocaleString()}</div>
+                </div>
+
+                <div className="stat bg-base-100 rounded shadow">
+                    <div className="stat-title">Total Due</div>
+                    <div className="stat-value text-error">
+                        ৳{totalDue.toLocaleString()}
+                    </div>
+                </div>
+
+                <div className="stat bg-base-100 rounded shadow">
+                    <div className="stat-title">Last Flight Pax</div>
+                    <div className="stat-value">
+                        {lastFlight?.flight?.passengers || 0}
+                    </div>
+                    <div className="stat-desc">
+                        {lastFlight?.flight?.segments?.length
+                            ? format(
+                                new Date(lastFlight.flight.segments[0].date),
+                                "dd MMM yyyy"
+                            )
+                            : ""}
+                    </div>
+                </div>
+
 
             </div>
 
+            {/* ================= CHART SECTION ================= */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
+                {/* BAR 1 */}
+                <div className="bg-base-100 p-4 rounded shadow">
+                    <h3 className="font-semibold mb-3">Top Agencies by Seats</h3>
+                    <ResponsiveContainer width="100%" height={280}>
+                        <BarChart data={agencySeats}>
+                            <XAxis dataKey="name" />
+                            <YAxis />
+                            <Tooltip />
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <Bar dataKey="seats" fill="#0f766e" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* BAR 2 */}
+                <div className="bg-base-100 p-4 rounded shadow">
+                    <h3 className="font-semibold mb-3">
+                        Top Fares by Passenger Count
+                    </h3>
+                    <ResponsiveContainer width="100%" height={280}>
+                        <BarChart data={farePassengers}>
+                            <XAxis dataKey="fare" />
+                            <YAxis />
+                            <Tooltip />
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <Bar dataKey="passengers" fill="#2563eb" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+                {/* PIE */}
+                <div className="bg-base-100 p-4 rounded shadow">
+                    <h3 className="font-semibold mb-3">Sales vs Due</h3>
+                    <ResponsiveContainer width="100%" height={280}>
+                        <PieChart>
+                            <Pie
+                                data={salesDueChart}
+                                dataKey="value"
+                                nameKey="name"
+                                outerRadius={100}
+                                label
+                            >
+                                {salesDueChart.map((_, i) => (
+                                    <Cell key={i} fill={COLORS[i]} />
+                                ))}
+                            </Pie>
+                            <Tooltip />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
+
+
+                <div>
+                    <ResponsiveContainer width="100%" >
+                        <BarChart data={bookingCountByDate}>
+                            <XAxis dataKey="date" />
+                            <YAxis />
+                            <Tooltip />
+                            <CartesianGrid strokeDasharray="3 3" />
+                            <Bar dataKey="count" fill="#9333ea" />
+                        </BarChart>
+                    </ResponsiveContainer>
+                </div>
+
+
+
+
+            </div>
         </div>
     );
 };
-
-/* ===== SMALL COMPONENTS ===== */
-
-const Metric = ({ title, value }) => (
-    <div className="bg-base-100 p-4 rounded shadow">
-        <p className="text-sm opacity-70">{title}</p>
-        <h3 className="text-xl font-bold">{value}</h3>
-    </div>
-);
-
-const ChartCard = ({ title, children }) => (
-    <div className="bg-base-100 p-4 rounded shadow">
-        <h3 className="font-semibold mb-2">{title}</h3>
-        <ResponsiveContainer width="100%" height={300}>
-            {children}
-        </ResponsiveContainer>
-    </div>
-);
 
 export default Home;
