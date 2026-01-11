@@ -16,7 +16,8 @@ const Home = () => {
     const axios = useAxios();
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
-    const {user,logoutUser}=useAuth()
+    const { user, logoutUser } = useAuth()
+    const [profile,setProfile]=useState()
     console.log(user);
     /* ================= FETCH BOOKINGS ================= */
 
@@ -30,10 +31,25 @@ const Home = () => {
                 console.error(err);
                 setLoading(false);
             });
+
+     
     }, [axios]);
 
-    /* ================= KPIs ================= */
+    // profile fetch
+    useEffect(() => {
+        if (user?.email) {
+            axios.get(`/users/${user.email}`)
+                .then(res => {
+                    setProfile(res.data);
+                })
+                .catch(err => {
+                    console.error("Error fetching profile:", err);
+                });     
+        }
+    }, [user, axios,setProfile]);
 
+
+    /* ================= KPIs ================= */
     const {
         totalBookings,
         totalSegments,
@@ -41,7 +57,7 @@ const Home = () => {
         totalCapacity,
         totalSales,
         totalDue,
-        lastFlight
+       
     } = useMemo(() => {
 
         let segments = 0;
@@ -50,17 +66,28 @@ const Home = () => {
         let sales = 0;
         let due = 0;
 
+        const countedFlights = new Set();
+
         bookings.forEach(b => {
             segments += b.flight?.segments?.length || 0;
             passengers += Number(b.flight?.passengers || 0);
-            capacity += Number(b.flight?.capacity || 0);
             sales += Number(b.fare?.totalFare || 0);
             due += Number(b.payment?.dueAmount || 0);
+
+            // ✅ UNIQUE FLIGHT KEY = FIRST SEGMENT DATE
+            const firstSegment = b.flight?.segments?.[0];
+            const flightKey = firstSegment
+                ? `${firstSegment.date}-${firstSegment.from}-${firstSegment.to}`
+                : null;
+
+            if (flightKey && !countedFlights.has(flightKey)) {
+                capacity += Number(b.flight?.capacity || 0);
+                countedFlights.add(flightKey);
+            }
         });
 
-        const last = [...bookings]
-            .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
 
+       
         return {
             totalBookings: bookings.length,
             totalSegments: segments,
@@ -68,21 +95,23 @@ const Home = () => {
             totalCapacity: capacity,
             totalSales: sales,
             totalDue: due,
-            lastFlight: last
+           
         };
 
     }, [bookings]);
 
-    // logout user 
-    const handleLogout=()=>{
-        logoutUser()
-        toast.success("Logged out successfully")
-    }
+
 
 
     /* =====================
    
-
+    LOGOUT HANDLER
+    ===================== */
+    // logout user 
+    const handleLogout = () => {
+        logoutUser()
+        toast.success("Logged out successfully")
+    }
 
     /* ================= BAR CHART 1: AGENCY vs SEATS ================= */
 
@@ -99,7 +128,7 @@ const Home = () => {
         return Object.entries(map)
             .map(([name, seats]) => ({ name, seats }))
             .sort((a, b) => b.seats - a.seats)
-            .slice(0, 5);
+            .slice(0, 10);
     }, [bookings]);
 
     /* ================= BAR CHART 2: FARE vs PASSENGERS ================= */
@@ -120,7 +149,7 @@ const Home = () => {
                 passengers
             }))
             .sort((a, b) => b.passengers - a.passengers)
-            .slice(0, 5);
+            .slice(0, 10);
     }, [bookings]);
 
     /* ================= PIE CHART: SALES vs DUE ================= */
@@ -149,34 +178,35 @@ const Home = () => {
         }, {})
     );
 
+    console.log(profile);
 
     return (
         <div className="h-screen overflow-y-auto p-5 space-y-6">
 
             {/* ================= TITLE ================= */}
             <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-bold text-[#003E3A]">
-                    Welcome Flynas
+                <h2 className="text-2xl font-mono font-bold text-[#003E3A]">
+                    Welcome {profile?.name || "User"} <br /><span className="text-base">Flynas Airoffice</span>
                 </h2>
 
                 <div className="dropdown dropdown-end">
                     <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
                         <div className="w-10 rounded-full">
                             <img
-                                alt="Tailwind CSS Navbar component"
-                                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                                alt={`${profile?.name || "User"}'s Avatar`}
+                                src={`${profile?.photo_url}`} />
                         </div>
                     </div>
                     <ul
                         tabIndex="-1"
                         className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-5 shadow">
                         <li>
-                            <a className="justify-between">
-                                Profile
-                                <span className="badge">New</span>
+                            <a className="justify-between text-[#00b7ac]  font-semibold">
+                                {profile?.name || "User"}
+                               
                             </a>
                         </li>
-                        
+
                         <li><a className="" onClick={handleLogout}>Logout</a></li>
                     </ul>
 
@@ -184,7 +214,7 @@ const Home = () => {
             </div>
             {/* ================= KPI CARDS ================= */}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 
                 <div className="stat bg-base-100 rounded shadow">
                     <div className="stat-title">Total Capacity</div>
@@ -195,9 +225,18 @@ const Home = () => {
                     <div className="stat-title">Total Passengers</div>
                     <div className="stat-value">{totalPassengers}</div>
                 </div>
+
+                  <div className="stat bg-base-100 rounded shadow">
+                    <div className="stat-title">Capacity Used</div>
+                    <div className="stat-value">
+                        {totalCapacity
+                            ? ((totalPassengers / totalCapacity) * 100).toFixed(1)
+                            : 0}%
+                    </div>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
 
                 <div className="stat bg-base-100 rounded shadow">
                     <div className="stat-title">Bookings</div>
@@ -209,14 +248,7 @@ const Home = () => {
                     <div className="stat-value">{totalSegments}</div>
                 </div>
 
-                <div className="stat bg-base-100 rounded shadow">
-                    <div className="stat-title">Capacity Used</div>
-                    <div className="stat-value">
-                        {totalCapacity
-                            ? ((totalPassengers / totalCapacity) * 100).toFixed(1)
-                            : 0}%
-                    </div>
-                </div>
+              
 
                 <div className="stat bg-base-100 rounded shadow">
                     <div className="stat-title">Total Sales</div>
@@ -230,21 +262,7 @@ const Home = () => {
                     </div>
                 </div>
 
-                <div className="stat bg-base-100 rounded shadow">
-                    <div className="stat-title">Last Flight Pax</div>
-                    <div className="stat-value">
-                        {lastFlight?.flight?.passengers || 0}
-                    </div>
-                    <div className="stat-desc">
-                        {lastFlight?.flight?.segments?.length
-                            ? format(
-                                new Date(lastFlight.flight.segments[0].date),
-                                "dd MMM yyyy"
-                            )
-                            : ""}
-                    </div>
-                </div>
-
+               
 
             </div>
 

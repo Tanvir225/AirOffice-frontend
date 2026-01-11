@@ -1,7 +1,7 @@
 import React from 'react';
-import img1 from '../../assets/img/family.jpg'
-import img2 from '../../assets/img/Chairman.jpg'
-import img3 from '../../assets/img/flynas-saudi-arabia.jpg'
+import img2 from '../../assets/img/family.jpg'
+import img3 from '../../assets/img/Chairman.jpg'
+import img1 from '../../assets/img/flynas-saudi-arabia.jpg'
 import img4 from '../../assets/img/Flynas-Aircraft.jpg'
 
 const Landing = () => {
@@ -27,9 +27,9 @@ const Landing = () => {
                 style={{ backgroundImage: `url(${carouselItems[currentSlider].img})` }}
             >
                 {/* text container here */}
-                <div className="px-5 text-center text-white drop-shadow-lg duration-300 ease-linear">
-                    <h1 className="mb-3 text-xl font-semibold lg:text-3xl">{carouselItems[currentSlider].title}</h1>
-                    <p className="text-sm md:text-base lg:text-lg">{carouselItems[currentSlider].des}</p>
+                <div className="px-5 space-y-7 text-center text-white drop-shadow-lg duration-300 ease-linear">
+                    <h1 className="mb-3 text-xl font-bold lg:text-7xl">{carouselItems[currentSlider].title}</h1>
+                    <p className="text-sm md:text-base lg:text-xl w-full md:w-2/3 mx-auto text-center">{carouselItems[currentSlider].des}</p>
                 </div>
             </div>
 
@@ -47,23 +47,23 @@ import useAuth from '../../Hook/useAuth';
 const carouselItems = [
     {
         img: img1,
-        title: 'Escape 1',
-        des: 'A Symphony of Tranquility. Experience the perfect blend of relaxation and excitement.'
+        title: 'Flynas Airlines',
+        des: "Flynas is a leading Saudi Arabian airline committed to providing affordable and high-quality air travel services."
     },
     {
         img: img2,
-        title: 'Escape 2',
-        des: 'A Symphony of Tranquility. Experience the perfect blend of relaxation and excitement.'
+        title: 'Flynas Family',
+        des: 'Flynas values family connections and strives to provide a comfortable and enjoyable travel experience for families flying together.'
     },
     {
         img: img3,
-        title: 'Escape 3',
-        des: 'A Symphony of Tranquility. Experience the perfect blend of relaxation and excitement.'
+        title: 'Flynas Chairman',
+        des: 'Our chairman is committed to leading Flynas towards excellence in the aviation industry through innovation and customer satisfaction.'
     },
     {
         img: img4,
-        title: 'Escape 4',
-        des: 'A Symphony of Tranquility. Experience the perfect blend of relaxation and excitement.'
+        title: 'Flynas Aircraft',
+        des:"Flynas operates a modern fleet of aircraft designed to provide comfort and efficiency for our passengers."
     },
 
 ];

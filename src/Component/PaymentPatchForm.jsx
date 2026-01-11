@@ -1,11 +1,13 @@
 import { useState } from "react";
-import axios from "axios";
+
 import toast from "react-hot-toast";
+import useAxios from "../Hook/useAxios";
 
 const PaymentPatchForm = ({ booking, onClose, onSuccess }) => {
     const [amount, setAmount] = useState("");
     const [note, setNote] = useState("");
     const [status, setStatus] = useState("");
+    const axios = useAxios();
     const [loading, setLoading] = useState(false);
 
     const dueAmount = booking?.payment?.dueAmount || 0;
@@ -29,8 +31,8 @@ const PaymentPatchForm = ({ booking, onClose, onSuccess }) => {
         setLoading(true);
 
         try {
-            await axios.patch(
-                `http://localhost:5000/api/bookings/${booking._id}/payment`,
+            axios.patch(
+                `/bookings/${booking._id}/payment`,
                 {
                     amount: payAmount,
                     note

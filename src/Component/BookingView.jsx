@@ -10,7 +10,7 @@ const BookingView = ({ booking, onClose }) => {
 
     return (
         <div className="fixed  inset-0 bg-black/40 flex justify-center items-start z-50 overflow-y-auto">
-            <div className="bg-white w-[210mm] h-full p-6 my-2 print:m-0 print:shadow-none">
+            <div className="bg-white w-[210mm]  p-6 my-2 print:m-0 print:shadow-none">
 
                 {/* HEADER */}
                 <div className="flex justify-between items-center border-b pb-3 mb-4">

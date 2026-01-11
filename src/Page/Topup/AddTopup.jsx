@@ -1,10 +1,11 @@
 import { useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import useAxios from "../../Hook/useAxios";
 
 const AddTopup = ({ onSuccess }) => {
     const [type, setType] = useState("credit");
+    const axios = useAxios();
     const navigate = useNavigate();
     const [form, setForm] = useState({
         date: "",
@@ -21,14 +22,13 @@ const AddTopup = ({ onSuccess }) => {
     const handleSubmit = async e => {
         e.preventDefault();
 
-        await axios.post("http://localhost:5000/api/topups", {
+        axios.post("/topups", {
             type,
             ...form
         });
 
         setForm({ date: "", time: "", amount: "", pnr: "", description: "" });
-        onSuccess(
-        );
+        ;
 
         toast.success("Topup added successfully");
         navigate("/flynas/topup");

@@ -243,7 +243,7 @@ const AddBooking = () => {
 
           <button
             type="submit"
-            className={`btn w-full bg-[#00A651] text-white ${loading && "loading"}`}
+            className={`btn w-full bg-[#00b7ac] text-white hover:bg-neutral ${loading && "loading"}`}
           >
             Save Booking
           </button>
