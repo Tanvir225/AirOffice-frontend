@@ -6,6 +6,8 @@ import {
 import { useEffect, useMemo, useState } from "react";
 import useAxios from "../../Hook/useAxios";
 import { format } from "date-fns";
+import useAuth from "../../Hook/useAuth";
+import toast from "react-hot-toast";
 
 const COLORS = ["#0f766e", "#2563eb", "#9333ea", "#f59e0b", "#ef4444"];
 
@@ -14,7 +16,8 @@ const Home = () => {
     const axios = useAxios();
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
-
+    const {user,logoutUser}=useAuth()
+    console.log(user);
     /* ================= FETCH BOOKINGS ================= */
 
     useEffect(() => {
@@ -69,6 +72,12 @@ const Home = () => {
         };
 
     }, [bookings]);
+
+    // logout user 
+    const handleLogout=()=>{
+        logoutUser()
+        toast.success("Logged out successfully")
+    }
 
 
     /* =====================
@@ -150,6 +159,28 @@ const Home = () => {
                     Welcome Flynas
                 </h2>
 
+                <div className="dropdown dropdown-end">
+                    <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                        <div className="w-10 rounded-full">
+                            <img
+                                alt="Tailwind CSS Navbar component"
+                                src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                        </div>
+                    </div>
+                    <ul
+                        tabIndex="-1"
+                        className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-5 shadow">
+                        <li>
+                            <a className="justify-between">
+                                Profile
+                                <span className="badge">New</span>
+                            </a>
+                        </li>
+                        
+                        <li><a className="" onClick={handleLogout}>Logout</a></li>
+                    </ul>
+
+                </div>
             </div>
             {/* ================= KPI CARDS ================= */}
 
