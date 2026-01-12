@@ -44,6 +44,7 @@ const BookingView = ({ booking, onClose }) => {
                     <table className="w-full text-sm border text-center">
                         <tbody>
                             <tr><th className="border p-2">Agency Name</th><td className="border p-2">{booking.agency?.name}</td></tr>
+                            <tr><th className="border p-2">PNR</th><td className="border p-2">{booking.flight?.PNR}</td></tr>
                             <tr><th className="border p-2">Contact Person</th><td className="border p-2">{booking.agency?.contactPerson}</td></tr>
                             <tr><th className="border p-2">Phone</th><td className="border p-2">{booking.agency?.phone}</td></tr>
                             <tr><th className="border p-2">Address</th><td className="border p-2">{booking.agency?.address}</td></tr>

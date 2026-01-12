@@ -6,12 +6,17 @@ import { format } from "date-fns";
 import PaymentPatchForm from "../Component/PaymentPatchForm";
 import BookingView from "../Component/BookingView";
 import { Link } from "react-router-dom";
+import EditBooking from "../Component/EditBooking";
 import useAxios from "../Hook/useAxios";
+import Swal from 'sweetalert2'
+
+
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 const BookingsGrid = () => {
     const [rowData, setRowData] = useState([]);
+    const [editBooking, setEditBooking] = useState(null);
     const axios = useAxios();
     const [loading, setLoading] = useState(true);
     const [selectedBooking, setSelectedBooking] = useState(null);
@@ -63,17 +68,37 @@ const BookingsGrid = () => {
     const handleView = (data) => setViewBooking(data);
 
     const handleEdit = (data) => {
-        alert(`Edit booking ${data._id}`);
+        setEditBooking(data);
     };
+
 
     const handlePayment = (data) => {
-        setSelectedBooking(data);
+        const freshBooking = rowData.find(b => b._id === data._id);
+        setSelectedBooking(freshBooking);
     };
 
+
     const handleDelete = async (id) => {
-        if (!window.confirm("Delete this booking?")) return;
-        await axios.delete(`http://localhost:5000/api/bookings/${id}`);
-        fetchBookings();
+        const result = await Swal.fire({
+            title: "Are you sure?",
+            text: "You won't be able to revert this!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Yes, delete it!"
+        });
+
+        if (result.isConfirmed) {
+            try {
+                await axios.delete(`/bookings/${id}`);
+
+                // 🔥 instant UI update
+                setRowData(prev => prev.filter(b => b._id !== id));
+
+                Swal.fire("Deleted!", "Booking has been deleted.", "success");
+            } catch {
+                Swal.fire("Error", "Failed to delete booking", "error");
+            }
+        }
     };
 
     /* ================= ACTION CELL ================= */
@@ -97,6 +122,7 @@ const BookingsGrid = () => {
                 >
                     Edit
                 </button>
+
 
                 <button
                     className="btn btn-xs btn-info"
@@ -122,6 +148,7 @@ const BookingsGrid = () => {
         { headerName: "Agency", field: "agency.name" },
         { headerName: "Phone", field: "agency.phone" },
         { headerName: "Contact", field: "agency.contactPerson" },
+        { headerName: "PNR", field: "flight.PNR" },
         {
             headerName: "Route",
             valueGetter: (p) =>
@@ -169,7 +196,7 @@ const BookingsGrid = () => {
     }
 
     return (
-        <div className="p-5">
+        <div className="p-5 h-screen overflow-y-auto">
             <h2 className="text-[#003E3A] text-xl font-semibold mb-4">
                 Bookings Management | {rowData.length} Records
             </h2>
@@ -236,6 +263,15 @@ const BookingsGrid = () => {
                     onClose={() => setViewBooking(null)}
                 />
             )}
+
+            {editBooking && (
+                <EditBooking
+                    bookingData={editBooking}
+                    onClose={() => setEditBooking(null)}
+                    onSuccess={fetchBookings}
+                />
+            )}
+
 
             {loading && (
                 <p className="text-center mt-3">Loading bookings...</p>

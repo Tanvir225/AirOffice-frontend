@@ -54,7 +54,7 @@ const PaymentPage = () => {
     };
 
     return (
-        <div className="p-6">
+        <div className="p-6 h-screen overflow-y-auto">
             <h2 className="text-2xl font-semibold text-[#003E3A] mb-4">
                 Payment Search
             </h2>

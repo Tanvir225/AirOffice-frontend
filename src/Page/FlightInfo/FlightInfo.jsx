@@ -100,7 +100,7 @@ const FlightInfo = () => {
     }
 
     return (
-        <div className="bg-base-100 p-5 rounded-lg shadow ">
+        <div className="bg-base-100 p-5 rounded-lg shadow h-screen overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">✈️ Flight Information</h2>
 
             {/* Global Search */}

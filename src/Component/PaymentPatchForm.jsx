@@ -1,16 +1,20 @@
-import { useState } from "react";
-
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import useAxios from "../Hook/useAxios";
 
 const PaymentPatchForm = ({ booking, onClose, onSuccess }) => {
     const [amount, setAmount] = useState("");
     const [note, setNote] = useState("");
-    const [status, setStatus] = useState("");
-    const axios = useAxios();
     const [loading, setLoading] = useState(false);
+    const axios = useAxios();
 
-    const dueAmount = booking?.payment?.dueAmount || 0;
+    const dueAmount = Number(booking?.payment?.dueAmount || 0);
+
+    // ✅ RESET FORM WHEN BOOKING CHANGES
+    useEffect(() => {
+        setAmount("");
+        setNote("");
+    }, [booking]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -26,12 +30,12 @@ const PaymentPatchForm = ({ booking, onClose, onSuccess }) => {
             toast.error("Payment amount exceeds due amount");
             return;
         }
-        
 
         setLoading(true);
 
         try {
-            axios.patch(
+            // ✅ AWAIT PATCH REQUEST
+            await axios.patch(
                 `/bookings/${booking._id}/payment`,
                 {
                     amount: payAmount,
@@ -41,14 +45,15 @@ const PaymentPatchForm = ({ booking, onClose, onSuccess }) => {
 
             toast.success("Payment updated successfully");
 
-            onSuccess && onSuccess(); // refresh grid
-            onClose && onClose();     // close modal
+            onClose?.();    // close modal first
+            onSuccess?.();  // then refresh grid
 
         } catch (error) {
-           toast.error("Failed to update payment");
+            console.error(error);
+            toast.error("Failed to update payment");
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (
@@ -61,49 +66,45 @@ const PaymentPatchForm = ({ booking, onClose, onSuccess }) => {
 
                 <form onSubmit={handleSubmit} className="space-y-4">
 
-                    {/* AGENCY */}
                     <div className="text-sm text-gray-600">
                         <strong>Agency:</strong> {booking.agency?.name}
                     </div>
 
-                    {/* DUE */}
                     <div>
                         <label className="text-sm text-gray-600">Due Amount</label>
                         <input
                             value={dueAmount}
                             disabled
-                            className="input w-full bg-gray-100 border border-[#D1FAE5] focus:outline-none focus:ring-0"
+                            className="input w-full bg-gray-100 border border-[#D1FAE5] focus:outline-none"
                         />
                     </div>
 
-                    {/* PAYMENT */}
                     <div>
                         <label className="text-sm text-gray-600">Payment Amount</label>
                         <input
                             type="number"
                             value={amount}
                             required
-                            className="input w-full border border-[#D1FAE5] focus:outline-none focus:ring-0"
+                            className="input w-full border border-[#D1FAE5] focus:outline-none"
                             onChange={(e) => setAmount(e.target.value)}
                         />
                     </div>
 
-                    {/* NOTE */}
                     <div>
                         <label className="text-sm text-gray-600">Note</label>
                         <textarea
                             value={note}
                             placeholder="Cash / Bank / Reference"
-                            className="textarea w-full border border-[#D1FAE5] focus:outline-none focus:ring-0"
+                            className="textarea w-full border border-[#D1FAE5] focus:outline-none"
                             onChange={(e) => setNote(e.target.value)}
                         />
                     </div>
 
-                    {/* ACTIONS */}
                     <div className="flex gap-2 pt-3">
                         <button
                             type="submit"
-                            className={`btn flex-1 bg-[#00A651] hover:btn-primary text-white ${loading && "loading"}`}
+                            disabled={loading}
+                            className={`btn flex-1 bg-[#00A651] text-white ${loading && "loading"}`}
                         >
                             Save Payment
                         </button>
@@ -111,7 +112,7 @@ const PaymentPatchForm = ({ booking, onClose, onSuccess }) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="btn btn-warning flex-1 border border-gray-300"
+                            className="btn btn-warning flex-1"
                         >
                             Cancel
                         </button>
