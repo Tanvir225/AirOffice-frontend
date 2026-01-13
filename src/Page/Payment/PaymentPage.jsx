@@ -49,9 +49,9 @@ const PaymentPage = () => {
 
     /* ================= PRINT ================= */
 
-    const handlePrint = () => {
-        window.print();
-    };
+    // const handlePrint = () => {
+    //     window.print();
+    // };
 
     return (
         <div className="p-6 h-screen overflow-y-auto">
@@ -61,7 +61,7 @@ const PaymentPage = () => {
 
             {/* ================= SEARCH PANEL ================= */}
             <div className="bg-white shadow rounded-lg p-4 mb-5 no-print">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <input
                         type="date"
                         value={date}
@@ -84,12 +84,12 @@ const PaymentPage = () => {
                         Search
                     </button>
 
-                    <button
+                    {/* <button
                         onClick={handlePrint}
                         className="btn btn-outline btn-success"
                     >
                         Print
-                    </button>
+                    </button> */}
                 </div>
             </div>
 
@@ -159,12 +159,12 @@ const PaymentPage = () => {
                         <div className="grid grid-cols-3 gap-3 text-sm mb-3">
                             <div>
                                 <strong>Total Fare</strong>
-                                <div>{b.fare?.totalFare}</div>
+                                <div>{b.fare?.totalFare.toLocaleString()} BDT</div>
                             </div>
 
                             <div>
                                 <strong>Paid</strong>
-                                <div>{b.payment?.paidAmount}</div>
+                                <div>{b.payment?.paidAmount.toLocaleString()} BDT</div>
                             </div>
 
                             <div>
@@ -176,7 +176,7 @@ const PaymentPage = () => {
                                             : "text-red-600 font-semibold"
                                     }
                                 >
-                                    {b.payment?.dueAmount}
+                                    {b.payment?.dueAmount.toLocaleString()} BDT
                                 </div>
                             </div>
                         </div>
@@ -206,7 +206,7 @@ const PaymentPage = () => {
                                                     )}
                                                 </td>
                                                 <td className="border p-2">
-                                                    {h.amount}
+                                                    {h.amount.toLocaleString()} BDT
                                                 </td>
                                                 <td className="border p-2">
                                                     {h.note}

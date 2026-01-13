@@ -11,6 +11,10 @@ import Login from "../Page/Login/Login";
 import PrivateRoute from "./PrivateRoute";
 import Landing from "../Page/Landing/Landing";
 import Land from "../Layout/Land";
+import HajjHome from "../Page/Hajj/HajjHome";
+import Reservation from "../Page/Hajj/Reservation";
+import Payorder from "../Page/Hajj/Payorder";
+import AddHajjReservation from "../Page/Hajj/AddHajjReservation";
 
 
 const router = createBrowserRouter([
@@ -58,6 +62,23 @@ const router = createBrowserRouter([
       {
         path: "/flynas/flight-info",
         element: <FlightInfo></FlightInfo>
+      },
+
+      {
+        path: "/flynas/hajj-home",
+        element: <HajjHome></HajjHome>
+      },
+      {
+        path: "/flynas/hajj-reservation",
+        element: <Reservation></Reservation>
+      },
+      {
+        path: "/flynas/hajj-payorder",
+        element: <Payorder></Payorder>
+      },
+      {
+        path: "/flynas/add-reservation",
+        element: <AddHajjReservation></AddHajjReservation>
       },
 
     ],

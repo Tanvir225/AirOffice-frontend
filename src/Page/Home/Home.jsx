@@ -128,7 +128,7 @@ const Home = () => {
         return Object.entries(map)
             .map(([name, seats]) => ({ name, seats }))
             .sort((a, b) => b.seats - a.seats)
-            .slice(0, 10);
+            .slice(0, 8);
     }, [bookings]);
 
     /* ================= BAR CHART 2: FARE vs PASSENGERS ================= */
@@ -149,7 +149,7 @@ const Home = () => {
                 passengers
             }))
             .sort((a, b) => b.passengers - a.passengers)
-            .slice(0, 10);
+            .slice(0, 8);
     }, [bookings]);
 
     /* ================= PIE CHART: SALES vs DUE ================= */

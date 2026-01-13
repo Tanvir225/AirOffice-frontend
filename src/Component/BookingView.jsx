@@ -99,9 +99,9 @@ const BookingView = ({ booking, onClose }) => {
 
                     <table className="w-full text-sm border text-center">
                         <tbody>
-                            <tr><th className="border p-2">Total Fare</th><td className="border p-2">{booking.fare?.totalFare}</td></tr>
-                            <tr><th className="border p-2">Paid Amount</th><td className="border p-2">{booking.payment?.paidAmount}</td></tr>
-                            <tr><th className="border p-2">Due Amount</th><td className="border p-2">{booking.payment?.dueAmount}</td></tr>
+                            <tr><th className="border p-2">Total Fare</th><td className="border p-2">{booking.fare?.totalFare.toLocaleString()} BDT</td></tr>
+                            <tr><th className="border p-2">Paid Amount</th><td className="border p-2">{booking.payment?.paidAmount.toLocaleString()} BDT</td></tr>
+                            <tr><th className="border p-2">Due Amount</th><td className="border p-2">{booking.payment?.dueAmount.toLocaleString()} BDT</td></tr>
                             <tr><th className="border p-2">Status</th><td className="border p-2">{booking.payment?.status}</td></tr>
                         </tbody>
                     </table>
@@ -127,7 +127,7 @@ const BookingView = ({ booking, onClose }) => {
                                     <td className="border p-2">
                                         {format(h.date,'dd MMM yy')}
                                     </td>
-                                    <td className="border p-2">{h.amount}</td>
+                                    <td className="border p-2">{h.amount.toLocaleString()} BDT</td>
                                     <td className="border p-2">{h.note}</td>
                                 </tr>
                             ))}

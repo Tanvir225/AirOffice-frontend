@@ -4,7 +4,7 @@ import {
     Plane,
     CreditCard,
     Wallet,
-    FileText
+    HamburgerIcon
 } from "lucide-react";
 
 const Sidebar = () => {
@@ -14,7 +14,7 @@ const Sidebar = () => {
         { name: "Payments", path: "/flynas/payment", icon: <CreditCard size={18} /> },
         { name: "Topup Ledger", path: "/flynas/topup", icon: <Wallet size={18} /> },
         { name: "Flight Info", path: "/flynas/flight-info", icon: <Plane size={18} /> }
-        
+
     ];
 
     return (
@@ -46,6 +46,15 @@ const Sidebar = () => {
                         <span className="text-sm">{item.name}</span>
                     </NavLink>
                 ))}
+
+                <div className="dropdown w-full text-white">
+                    <div tabIndex={0} role="" className="w-full btn btn-sm">Hajj Portal</div>
+                    <ul tabIndex="-1" className="dropdown-content space-y-2 py-5 menu w-full rounded-box z-1  p-2 shadow-sm">
+                        <NavLink to="/flynas/hajj-home" className="hover:underline">Home</NavLink>
+                        <NavLink to="/flynas/hajj-reservation" className="hover:underline">Reservation</NavLink>
+                        <NavLink to="/flynas/hajj-payorder" className="hover:underline">Pay Order</NavLink>
+                    </ul>
+                </div>
             </nav>
         </aside>
     );

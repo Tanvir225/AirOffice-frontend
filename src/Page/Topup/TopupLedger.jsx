@@ -56,13 +56,13 @@ const TopupLedger = () => {
       {/* ================= SUMMARY ================= */}
       <div className="border-b pt-4 flex justify-between font-semibold text-lg">
         <span>
-          Total Credit: <span className="text-green-700">{totalCredit}</span>
+          Total Credit: <span className="text-green-700">{totalCredit.toLocaleString()} BDT</span>
         </span>
         <span>
-          Total Debit: <span className="text-red-600">{totalDebit}</span>
+          Total Debit: <span className="text-red-600">{totalDebit.toLocaleString()} BDT</span>
         </span>
         <span>
-          Balance: <span className="text-blue-700">{balance}</span>
+          Balance: <span className="text-blue-700">{balance.toLocaleString()} BDT</span>
         </span>
       </div>
 
@@ -88,7 +88,7 @@ const TopupLedger = () => {
                   <td className="border p-2">{c.date}</td>
                   <td className="border p-2">{c.time}</td>
                   <td className="border p-2 text-green-700 font-semibold">
-                    {c.amount}
+                    {c.amount.toLocaleString()} BDT
                   </td>
                   <td className="border p-2">{c.description}</td>
                 </tr>
@@ -119,7 +119,7 @@ const TopupLedger = () => {
                   <td className="border p-2">{d.date}</td>
                   <td className="border p-2">{d.time}</td>
                   <td className="border p-2 text-red-600 font-semibold">
-                    {d.amount}
+                    {d.amount.toLocaleString()} BDT
                   </td>
                   <td className="border p-2">{d.pnr}</td>
                   <td className="border p-2">{d.description}</td>
