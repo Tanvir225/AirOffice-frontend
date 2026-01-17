@@ -6,12 +6,12 @@ import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAfv2o8mjka3t1MCdxinBH8MZorqT_oLfE",
-  authDomain: "air-office-100.firebaseapp.com",
-  projectId: "air-office-100",
-  storageBucket: "air-office-100.firebasestorage.app",
-  messagingSenderId: "96151625480",
-  appId: "1:96151625480:web:c378bfc52cfa1ba6c296bd"
+  apiKey: "AIzaSyCaHd3pPjo0uKplV5iZ-GqW1AJhc0xGtUY",
+  authDomain: "air-office-28b26.firebaseapp.com",
+  projectId: "air-office-28b26",
+  storageBucket: "air-office-28b26.firebasestorage.app",
+  messagingSenderId: "174590492923",
+  appId: "1:174590492923:web:c72da38b4066a51ce5b05e"
 };
 
 // Initialize Firebase
