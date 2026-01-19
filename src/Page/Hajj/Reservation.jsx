@@ -60,7 +60,7 @@ const Reservation = () => {
         { headerName: "HL", field: "agency.hl", width: 130 },
         { headerName: "Tracking", field: "agency.trackingNo", width: 130 },
         { headerName: "Payorder", field: "agency.payorderNo", width: 130 },
-        { headerName: "PNR", field: "agency.pnr" , width: 100 },
+        { headerName: "PNR", field: "agency.pnr", width: 100 },
 
         {
             headerName: "Segments",
@@ -125,11 +125,11 @@ const Reservation = () => {
                 <Link to="/flynas/add-reservation" className="btn btn-sm text-white btn-success">Add Reservation</Link>
             </div>
             {/* DATA GRID */}
-            <div className="ag-theme-alpine w-full h-[90vh] text-center">
+            <div className="ag-theme-alpine w-full h-[90vh] text-center ">
                 <AgGridReact
                     rowData={rowData}
                     columnDefs={columns}
-                     pagination
+                    pagination
                     paginationPageSize={20}
                     animateRows
                     defaultColDef={{
