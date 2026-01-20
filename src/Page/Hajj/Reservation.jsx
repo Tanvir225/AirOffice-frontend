@@ -85,6 +85,10 @@ const Reservation = () => {
             field: "fare.totalFare",
             width: 130
         },
+        {
+            headerName: "Caller",
+            field: "callerName",
+        },
 
         {
             headerName: "Actions",

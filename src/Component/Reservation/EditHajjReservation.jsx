@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import useAxios from "../../Hook/useAxios";
+import useAuth from "../../Hook/useAuth";
 
 
 
 const EditHajjReservation = ({ data, onClose, onSuccess }) => {
     const axios = useAxios();
+    const {user} = useAuth()
     const [loading, setLoading] = useState(false);
+    const [profile, setProfile] = useState();
 
     const [reservation, setReservation] = useState({
         agency: {
@@ -39,6 +42,20 @@ const EditHajjReservation = ({ data, onClose, onSuccess }) => {
         }
     }, [data]);
 
+    // user get 
+    useEffect(() => {
+        if (user?.email) {
+            axios.get(`/users/${user.email}`)
+                .then(res => {
+                    setProfile(res?.data)
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+
+        }
+    }, [axios, user])
+
     /* =========================
        AUTO TOTAL FARE
     ========================= */
@@ -51,9 +68,10 @@ const EditHajjReservation = ({ data, onClose, onSuccess }) => {
             fare: {
                 ...prev.fare,
                 totalFare: pilgrims * perPassenger
-            }
+            },
+            callerName:profile?.name
         }));
-    }, [reservation.flight.pilgrims, reservation.fare.perPassenger]);
+    }, [reservation.flight.pilgrims, reservation.fare.perPassenger,profile]);
 
     /* =========================
        HANDLERS
@@ -238,6 +256,21 @@ const EditHajjReservation = ({ data, onClose, onSuccess }) => {
                             value={reservation.fare.totalFare}
                             disabled
                             className="input input-bordered"
+                        />
+                    </div>
+
+                    {/* caller name */}
+                    <div className="bg-white border border-blue-300 p-4 rounded-lg">
+                        <h2 className="text-[#003E3A] font-semibold mb-3">
+                            Caller Name <span className="text-red-600 text-base">*</span>
+                        </h2>
+                        <input
+                            type="text"
+                            required
+                            value={profile?.name}
+                            disabled
+                            className="input p-2 w-full bg-gray-100 border border-blue-300 focus:outline-none focus:ring-0"
+                            placeholder="Caller Name"
                         />
                     </div>
 

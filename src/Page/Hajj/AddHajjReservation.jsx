@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import { Link, useNavigate } from "react-router-dom";
 import useAxios from "../../Hook/useAxios";
+import useAuth from "../../Hook/useAuth";
 
 const AddHajjReservation = ({ onSuccess, onClose }) => {
     const axios = useAxios();
+    const { user } = useAuth();
+    const [profile, setProfile] = useState()
     const navigate = useNavigate();
 
     /* =========================
@@ -26,6 +29,21 @@ const AddHajjReservation = ({ onSuccess, onClose }) => {
     const [pilgrims, setPilgrims] = useState("");
     const [farePerPilgrim, setFarePerPilgrim] = useState("");
     const [loading, setLoading] = useState(false);
+
+
+    // user get 
+    useEffect(() => {
+        if (user?.email) {
+            axios.get(`/users/${user.email}`)
+                .then(res => {
+                    setProfile(res?.data)
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+
+        }
+    }, [axios, user])
 
     /* =========================
        CALCULATIONS
@@ -81,7 +99,8 @@ const AddHajjReservation = ({ onSuccess, onClose }) => {
                 fare: {
                     farePerPilgrim: Number(farePerPilgrim),
                     totalFare
-                }
+                },
+                callerName:profile?.name
             });
 
             toast.success("Hajj reservation added");
@@ -98,7 +117,7 @@ const AddHajjReservation = ({ onSuccess, onClose }) => {
 
     return (
         <div className=" flex items-center justify-center z-50">
-            <div className=" w-full  rounded-xl p-6">
+            <div className=" w-full  rounded-xl p-6 h-screen overflow-y-auto">
 
                 <div className="flex items-center justify-between border-b-2 mb-2">
                     <Link to="/flynas/hajj-reservation" className="btn btn-sm btn-success text-white">Back</Link>
@@ -248,6 +267,22 @@ const AddHajjReservation = ({ onSuccess, onClose }) => {
                         />
                     </div>
 
+                    {/* caller name */}
+                    <div className="bg-white border border-blue-300 p-4 rounded-lg">
+                        <h2 className="text-[#003E3A] font-semibold mb-3">
+                            Caller Name <span className="text-red-600 text-base">*</span>
+                        </h2>
+                        <input
+                            type="text"
+                            required
+                            value={profile?.name}
+                            disabled
+                            className="input p-2 w-full bg-gray-100 border border-blue-300 focus:outline-none focus:ring-0"
+                            placeholder="Caller Name"
+                        />
+                    </div>
+
+
                     {/* =========================
                        ACTIONS
                     ========================= */}
@@ -259,13 +294,12 @@ const AddHajjReservation = ({ onSuccess, onClose }) => {
                             Save Reservation
                         </button>
 
-                        <button
-                            type="button"
-                            onClick={onClose}
+                        <Link
+                            to={"/flynas/hajj-reservation"}
                             className="btn btn-warning flex-1"
                         >
                             Cancel
-                        </button>
+                        </Link>
                     </div>
 
                 </form>
