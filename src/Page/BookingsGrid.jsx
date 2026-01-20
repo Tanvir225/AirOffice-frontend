@@ -179,6 +179,7 @@ const BookingsGrid = () => {
                 color: p.value === "CONFIRM" ? "green" : "orange",
             }),
         },
+        { headerName: "Caller", field: "callerName" },
         {
             headerName: "Actions",
             cellRenderer: ActionRenderer,

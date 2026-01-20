@@ -80,6 +80,7 @@ const TopupLedger = () => {
                 <th className="border p-2">Time</th>
                 <th className="border p-2">Amount</th>
                 <th className="border p-2">Description</th>
+                <th className="border p-2">Caller</th>
               </tr>
             </thead>
             <tbody>
@@ -91,6 +92,7 @@ const TopupLedger = () => {
                     {c.amount.toLocaleString()} BDT
                   </td>
                   <td className="border p-2">{c.description}</td>
+                  <td className="border p-2">{c.callerName}</td>
                 </tr>
               ))}
             </tbody>
@@ -111,6 +113,7 @@ const TopupLedger = () => {
                 <th className="border p-2">Amount</th>
                 <th className="border p-2">PNR</th>
                 <th className="border p-2">Description</th>
+                <th className="border p-2">Caller</th>
               </tr>
             </thead>
             <tbody>
@@ -123,6 +126,7 @@ const TopupLedger = () => {
                   </td>
                   <td className="border p-2">{d.pnr}</td>
                   <td className="border p-2">{d.description}</td>
+                  <td className="border p-2">{d.callerName}</td>
                 </tr>
               ))}
             </tbody>

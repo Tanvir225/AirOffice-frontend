@@ -1,13 +1,30 @@
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import useAxios from "../Hook/useAxios";
+import useAuth from "../Hook/useAuth";
 
 
 const EditBooking = ({ bookingData, onClose, onSuccess }) => {
     const axios = useAxios();
     const [loading, setLoading] = useState(false);
+    const [profile, setProfile] = useState();
+    const { user } = useAuth()
 
     const [booking, setBooking] = useState(null);
+
+    // user get 
+    useEffect(() => {
+        if (user?.email) {
+            axios.get(`/users/${user.email}`)
+                .then(res => {
+                    setProfile(res?.data)
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+
+        }
+    }, [axios, user])
 
     /* ================= INIT DATA ================= */
     useEffect(() => {
@@ -18,10 +35,11 @@ const EditBooking = ({ bookingData, onClose, onSuccess }) => {
                     ...bookingData.flight,
                     segments: bookingData.flight.segments || []
                 },
-                fare: { ...bookingData.fare }
+                fare: { ...bookingData.fare },
+                callerName: profile?.name
             });
         }
-    }, [bookingData]);
+    }, [bookingData,profile]);
 
     /* ================= AUTO TOTAL FARE ================= */
     useEffect(() => {
@@ -41,12 +59,15 @@ const EditBooking = ({ bookingData, onClose, onSuccess }) => {
 
     if (!booking) return null;
 
+
+
+
     /* ================= HANDLERS ================= */
 
     const handleAgencyChange = (e) => {
         setBooking({
             ...booking,
-            agency: { ...booking.agency, [e.target.name]: e.target.value }
+            agency: { ...booking.agency, [e.target.name]: e.target.value },
         });
     };
 
@@ -69,7 +90,8 @@ const EditBooking = ({ bookingData, onClose, onSuccess }) => {
                     ...booking.flight.segments,
                     { date: "", from: "", to: "", flightNo: "" }
                 ]
-            }
+            },
+
         });
     };
 
@@ -238,6 +260,21 @@ const EditBooking = ({ bookingData, onClose, onSuccess }) => {
                                 className=" input input-bordered w-full hover:outline-none"
                             />
                         </div>
+                    </div>
+
+                    {/* caller name */}
+                    <div className="bg-white border border-blue-300 p-4 rounded-lg">
+                        <h2 className="text-[#003E3A] font-semibold mb-3">
+                            Caller Name <span className="text-red-600 text-base">*</span>
+                        </h2>
+                        <input
+                            type="text"
+                            required
+                            value={profile?.name}
+                            disabled
+                            className="input p-2 w-full bg-gray-100 border border-blue-300 focus:outline-none focus:ring-0"
+                            placeholder="Caller Name"
+                        />
                     </div>
 
                     <div className="flex gap-3">

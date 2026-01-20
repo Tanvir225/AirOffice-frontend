@@ -1,10 +1,14 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
 import useAxios from "../../Hook/useAxios";
+import useAuth from "../../Hook/useAuth";
 
 const AddTopup = ({ onSuccess }) => {
     const [type, setType] = useState("credit");
+    const [profile, setProfile] = useState();
+    const { user } = useAuth();
+
     const axios = useAxios();
     const navigate = useNavigate();
     const [form, setForm] = useState({
@@ -15,6 +19,21 @@ const AddTopup = ({ onSuccess }) => {
         description: ""
     });
 
+
+    // user get 
+    useEffect(() => {
+        if (user?.email) {
+            axios.get(`/users/${user.email}`)
+                .then(res => {
+                    setProfile(res?.data)
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+
+        }
+    }, [axios, user])
+
     const handleChange = e => {
         setForm({ ...form, [e.target.name]: e.target.value });
     };
@@ -24,15 +43,22 @@ const AddTopup = ({ onSuccess }) => {
 
         axios.post("/topups", {
             type,
-            ...form
-        });
+            ...form,
+            callerName: profile?.name
+        }).then(res => {
+            if (res?.data) {
+                setForm({ date: "", time: "", amount: "", pnr: "", description: "" });
+                ;
 
-        setForm({ date: "", time: "", amount: "", pnr: "", description: "" });
-        ;
+                toast.success("Topup added successfully");
+                navigate("/flynas/topup");
+            }
+        })
 
-        toast.success("Topup added successfully");
-        navigate("/flynas/topup");
+
     };
+
+
 
     return (
         <form onSubmit={handleSubmit} className="bg-white p-4 rounded border w-full">
@@ -74,6 +100,21 @@ const AddTopup = ({ onSuccess }) => {
                     onChange={handleChange}
                     className="border p-2 col-span-2"
                     placeholder="Description"
+                />
+            </div>
+
+            {/* caller name */}
+            <div className="bg-white border border-blue-300 p-4 rounded-lg my-2">
+                <h2 className="text-[#003E3A] font-semibold mb-3">
+                    Caller Name <span className="text-red-600 text-base">*</span>
+                </h2>
+                <input
+                    type="text"
+                    required
+                    value={profile?.name}
+                    disabled
+                    className="input p-2 w-full bg-gray-100 border border-blue-300 focus:outline-none focus:ring-0"
+                    placeholder="Caller Name"
                 />
             </div>
 
