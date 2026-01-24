@@ -56,11 +56,11 @@ const Reservation = () => {
        COLUMNS
     ========================= */
     const columns = [
-        { headerName: "Agency", field: "agency.name", width: 130 },
+        { headerName: "Agency", field: "agency.name", width: 160 },
         { headerName: "HL", field: "agency.hl", width: 130 },
-        { headerName: "Tracking", field: "agency.trackingNo", width: 130 },
-        { headerName: "Payorder", field: "agency.payorderNo", width: 130 },
-        { headerName: "PNR", field: "agency.pnr", width: 100 },
+        { headerName: "Tracking", field: "agency.trackingNo", width: 160 },
+        { headerName: "Payorder", field: "agency.payorderNo", width: 160 },
+        { headerName: "PNR", field: "agency.pnr", width: 130 },
 
         {
             headerName: "Segments",
@@ -77,8 +77,13 @@ const Reservation = () => {
         {
             headerName: "Pilgrims",
             field: "flight.pilgrims",
-            width: 110
+            width: 110,
+            valueFormatter: (params) => {
+                const num = Number(params.value);
+                return isNaN(num) ? "" : num;
+            }
         },
+
 
         {
             headerName: "Total Fare",
@@ -124,7 +129,7 @@ const Reservation = () => {
         <div className="p-3 h-screen overflow-y-auto">
             <div className="flex justify-between items-center mb-2">
                 <h2 className="text-2xl font-semibold mb-2">
-                    Hajj Reservations
+                    Hajj Reservations | {rowData?.length}
                 </h2>
                 <Link to="/flynas/add-reservation" className="btn btn-sm text-white btn-success">Add Reservation</Link>
             </div>
@@ -140,6 +145,7 @@ const Reservation = () => {
                         sortable: true,
                         filter: true,
                         resizable: true,
+                        floatingFilter:true
                     }}
                 />
             </div>
