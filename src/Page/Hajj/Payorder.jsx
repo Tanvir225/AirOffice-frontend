@@ -64,7 +64,7 @@ const Payorder = () => {
                         </h3>
 
                         <span className="text-sm font-semibold text-green-600">
-                            Per Pax Fare: {r.fare?.perPassenger} BDT
+                            Per Pax Fare: {r.fare?.farePerPilgrim} BDT
                         </span>
                         <span className="text-sm font-semibold text-green-600">
                             Total Fare: {r.fare?.totalFare.toLocaleString()} BDT
