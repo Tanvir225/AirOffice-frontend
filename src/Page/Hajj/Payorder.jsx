@@ -23,9 +23,14 @@ const Payorder = () => {
         <div className="p-6 text-black space-y-3 overflow-y-auto h-screen">
 
             {/* SEARCH BAR */}
-            <div className="border border-[#D1FAE5] rounded-xl p-3 grid md:grid-cols-3 gap-4">
+            <div className="border border-[#D1FAE5] rounded-xl p-3 grid grid-cols-2 md:grid-cols-4 gap-4">
                 <input
-                    placeholder="Agency HL No"
+                    placeholder="Flight No"
+                    className="input input-bordered w-full "
+                    onKeyDown={e => e.key === "Enter" && search(`flightNo=${e.target.value}`)}
+                />
+                <input
+                    placeholder="Agency HL"
                     className="input input-bordered w-full "
                     onKeyDown={e => e.key === "Enter" && search(`hl=${e.target.value}`)}
                 />
