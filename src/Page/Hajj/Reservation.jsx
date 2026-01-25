@@ -6,6 +6,7 @@ import useAxios from "../../Hook/useAxios";
 import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { Link } from "react-router-dom";
+import { format } from "date-fns";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -94,6 +95,15 @@ const Reservation = () => {
             headerName: "Caller",
             field: "callerName",
         },
+        {
+            headerName: "creation_date",
+            cellDataType:'text',
+            field: "createdAt",
+            valueFormatter: (params) => {
+                const formatedDate = format(params.value, 'dd-MMMM-yy hh:mm a');
+                return (formatedDate)
+            },
+        },
 
         {
             headerName: "Actions",
@@ -145,7 +155,7 @@ const Reservation = () => {
                         sortable: true,
                         filter: true,
                         resizable: true,
-                        floatingFilter:true
+                        floatingFilter: true
                     }}
                 />
             </div>
