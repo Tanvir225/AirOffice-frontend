@@ -7,6 +7,7 @@ import { AllCommunityModule, ModuleRegistry } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 import { Link } from "react-router-dom";
 import { format } from "date-fns";
+import ErrorPage from "../../Component/Share/ErrorPage";
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -136,46 +137,49 @@ const Reservation = () => {
     ];
 
     return (
-        <div className="p-3 h-screen overflow-y-auto">
-            <div className="flex justify-between items-center mb-2">
-                <h2 className="text-2xl font-semibold mb-2">
-                    Hajj Reservations | {rowData?.length}
-                </h2>
-                <Link to="/flynas/add-reservation" className="btn btn-sm text-white btn-success">Add Reservation</Link>
-            </div>
-            {/* DATA GRID */}
-            <div className="ag-theme-alpine w-full h-[90vh] text-center ">
-                <AgGridReact
-                    rowData={rowData}
-                    columnDefs={columns}
-                    pagination
-                    paginationPageSize={20}
-                    animateRows
-                    defaultColDef={{
-                        sortable: true,
-                        filter: true,
-                        resizable: true,
-                        floatingFilter: true
-                    }}
-                />
-            </div>
+        // <div className="p-3 h-screen overflow-y-auto">
+        //     <div className="flex justify-between items-center mb-2">
+        //         <h2 className="text-2xl font-semibold mb-2">
+        //             Hajj Reservations | {rowData?.length}
+        //         </h2>
+        //         <Link to="/flynas/add-reservation" className="btn btn-sm text-white btn-success">Add Reservation</Link>
+        //     </div>
+        //     {/* DATA GRID */}
+        //     <div className="ag-theme-alpine w-full h-[90vh] text-center ">
+        //         <AgGridReact
+        //             rowData={rowData}
+        //             columnDefs={columns}
+        //             pagination
+        //             paginationPageSize={20}
+        //             animateRows
+        //             defaultColDef={{
+        //                 sortable: true,
+        //                 filter: true,
+        //                 resizable: true,
+        //                 floatingFilter: true
+        //             }}
+        //         />
+        //     </div>
 
-            {/* VIEW MODAL */}
-            {viewData && (
-                <ViewHajjReservation
-                    data={viewData}
-                    onClose={() => setViewData(null)}
-                />
-            )}
+        //     {/* VIEW MODAL */}
+        //     {viewData && (
+        //         <ViewHajjReservation
+        //             data={viewData}
+        //             onClose={() => setViewData(null)}
+        //         />
+        //     )}
 
-            {/* EDIT MODAL */}
-            {editData && (
-                <EditHajjReservation
-                    data={editData}
-                    onClose={() => setEditData(null)}
-                    onSuccess={fetchReservations}
-                />
-            )}
+        //     {/* EDIT MODAL */}
+        //     {editData && (
+        //         <EditHajjReservation
+        //             data={editData}
+        //             onClose={() => setEditData(null)}
+        //             onSuccess={fetchReservations}
+        //         />
+        //     )}
+        // </div>
+        <div>
+            <ErrorPage></ErrorPage>
         </div>
     );
 };
