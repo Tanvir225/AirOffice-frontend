@@ -54,6 +54,120 @@ const Reservation = () => {
     };
 
 
+
+    // handle print
+    const handlePrint = () => {
+        const printWindow = window.open("", "_blank");
+
+        const tableRows = rowData
+            .map((item, index) => {
+                const segments = item.flight?.segments
+                    ?.map(
+                        (s) =>
+                            `${s.from}-${s.to} (${s.date})`
+                    )
+                    .join("<br>");
+
+                return `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.agency?.name || ""}</td>
+                    <td>${item.agency?.hl || ""}</td>
+                    <td>${item.agency?.pnr || ""}</td>
+                    <td>${item.agency?.trackingNo || ""}</td>
+                    <td>${segments}</td>
+                    <td>${item.flight?.pilgrims || 0}</td>
+                    <td>${item.fare?.totalFare || 0}</td>
+                    <td>${item.callerName || ""}</td>
+                </tr>
+            `;
+            })
+            .join("");
+
+        printWindow.document.write(`
+        <html>
+        <head>
+            <title>Reservation Report</title>
+
+            <style>
+                @page {
+                    size: A4 landscape;
+                    margin: 10mm;
+                }
+
+                body {
+                    font-family: Arial, sans-serif;
+                    padding: 10px;
+                }
+
+                h2 {
+                    text-align: center;
+                    margin-bottom: 5px;
+                }
+
+                .info {
+                    margin-bottom: 15px;
+                }
+
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    font-size: 12px;
+                }
+
+                th,
+                td {
+                    border: 1px solid #000;
+                    padding: 6px;
+                    text-align: center;
+                }
+
+                th {
+                    background: #f0f0f0;
+                }
+            </style>
+        </head>
+
+        <body>
+            <h2>HAJJ RESERVATION REPORT</h2>
+
+            <div class="info">
+                <strong>Total Reservation:</strong> ${rowData.length}
+                <br/>
+                <strong>Print Date:</strong> ${new Date().toLocaleString()}
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Agency</th>
+                        <th>HL</th>
+                        <th>PNR</th>
+                        <th>Tracking</th>
+                        <th>Flight Route</th>
+                        <th>Pilgrims</th>
+                        <th>Total Fare</th>
+                        <th>Caller</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </body>
+        </html>
+    `);
+
+        printWindow.document.close();
+
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+    };
+
+
     /* =========================
        COLUMNS
     ========================= */
@@ -98,7 +212,7 @@ const Reservation = () => {
         },
         {
             headerName: "creation_date",
-            cellDataType:'text',
+            cellDataType: 'text',
             field: "createdAt",
             valueFormatter: (params) => {
                 const formatedDate = format(params.value, 'dd-MMMM-yy hh:mm a');
@@ -142,7 +256,15 @@ const Reservation = () => {
                 <h2 className="text-2xl font-semibold mb-2">
                     Hajj Reservations | {rowData?.length}
                 </h2>
-                <Link to="/flynas/add-reservation" className="btn btn-sm text-white btn-success">Add Reservation</Link>
+                <div>
+                    <button
+                        onClick={handlePrint}
+                        className="btn btn-primary btn-sm mr-2"
+                    >
+                        Print
+                    </button>
+                    <Link to="/flynas/add-reservation" className="btn btn-sm text-white btn-success">Add Reservation</Link>
+                </div>
             </div>
             {/* DATA GRID */}
             <div className="ag-theme-alpine w-full h-[90vh] text-center ">
